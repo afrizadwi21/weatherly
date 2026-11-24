@@ -5,16 +5,15 @@
 
 **A Full-Stack Weather Intelligence Platform for Hyperlocal Rain Nowcasting, Environmental Monitoring, Proactive Alerts, and AI-Driven Daily Decisions.**
 
-[![FastAPI](https://img.shields.io/badge/Backend-FastAPI_0.115+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Go](https://img.shields.io/badge/Backend-Go_1.23_%28Gin_%2B_pgx%29-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://go.dev/)
 [![Next.js](https://img.shields.io/badge/Web-Next.js_15_%2B_TypeScript-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![Flutter](https://img.shields.io/badge/Mobile-Flutter_3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev/)
 [![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL_%2B_PostGIS-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://postgis.net/)
-[![Redis](https://img.shields.io/badge/Cache_%26_Broker-Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
-[![Celery](https://img.shields.io/badge/Workers-Celery-37814A?style=for-the-badge&logo=celery&logoColor=white)](https://docs.celeryq.dev/)
+[![Redis](https://img.shields.io/badge/Cache_%26_Queue-Redis_%2B_Asynq-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![Docker](https://img.shields.io/badge/Infra-Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
 [Visi & Latar Belakang](#-kenapa-weatherly-dibuat-why-weatherly) •
-[Arsitektur Sistem](#-arsitektur-sistem-system-architecture) •
+[Arsitektur Sistem (Go)](#-arsitektur-sistem-system-architecture) •
 [8 Modul Utama](#-8-modul-fitur-utama-feature-architecture) •
 [Database & ERD](#-desain-database--erd-postgis) •
 [API Contract](#-api-contract--endpoints-apiv1) •
@@ -40,15 +39,17 @@ Di wilayah tropis dengan dinamika mikro-klimatologi yang cepat seperti **Indones
 ### 🎯 Tiga Pilar Utama Weatherly
 | Pilar | Pendekatan Konvensional | Pendekatan Weatherly Intelligence |
 | :--- | :--- | :--- |
-| **1. Prediction Accuracy** | Hanya menampilkan persentase peluang hujan harian tanpa konteks waktu kedatangan. | Menggabungkan multi-provider (*BMKG, OpenWeather One Call, Radar*) dengan evaluasi historis (*false alarm, missed rain event, arrival time accuracy*). |
-| **2. Intelligent Recommendation** | Grafik mentah yang harus diinterpretasikan sendiri oleh pengguna. | **Two-Stage AI Pipeline**: Rule Engine memvalidasi threshold cuaca/UV/AQI, lalu LLM merangkum rekomendasi aktivitas yang terverifikasi & bebas halusinasi. |
-| **3. Proactive Notification** | Pengguna harus membuka aplikasi untuk mengecek cuaca. | **Celery Alert Engine & FCM** mengirimkan peringatan *sebelum* hujan turun atau cuaca ekstrem melanda lokasi pengguna dengan *deduplication guard*. |
+| **1. Prediction Accuracy** | Hanya menampilkan persentase peluang hujan harian tanpa konteks waktu kedatangan. | Menggabungkan multi-provider (*BMKG, OpenWeather One Call, Radar*) secara paralel dengan *Go goroutines* & evaluasi historis (*false alarm, missed rain event, arrival time accuracy*). |
+| **2. Intelligent Recommendation** | Grafik mentah yang harus diinterpretasikan sendiri oleh pengguna. | **Two-Stage AI Pipeline**: Rule Engine memvalidasi threshold cuaca/UV/AQI dengan *strict Go type-safety*, lalu LLM merangkum rekomendasi aktivitas yang terverifikasi & bebas halusinasi. |
+| **3. Proactive Notification** | Pengguna harus membuka aplikasi untuk mengecek cuaca. | **Asynq (Go Redis Worker) & FCM** mengirimkan peringatan *sebelum* hujan turun atau cuaca ekstrem melanda lokasi pengguna dengan *deduplication guard*. |
 
 ---
 
 ## 🏗️ Arsitektur Sistem (*System Architecture*)
 
-Weatherly menggunakan arsitektur **Modular Monolith** di sisi backend yang dikombinasikan dengan **Asynchronous Distributed Task Queue (Celery + Redis)** dan **Spatial Database (PostgreSQL + PostGIS)**. Pendekatan ini dipilih agar memiliki pemisahan domain (*Separation of Concerns*) sekelas enterprise, mudah diuji (*testable*), namun tetap efisien untuk di-deploy dan dipelihara dalam satu **Monorepo**.
+Weatherly menggunakan arsitektur **Golang Modular Monolith (Clean Architecture)** di sisi backend yang dikombinasikan dengan **Asynchronous Distributed Task Queue (`Asynq` + Redis)** dan **Spatial Database (PostgreSQL + PostGIS)**.
+
+Pemilihan **Golang** memberikan keunggulan konkurensi tinggi (`goroutines` & `errgroup`) saat menarik dan menormalisasi data dari berbagai API cuaca eksternal secara simultan, konsumsi memori yang sangat hemat, *compile-time type safety* untuk mencegah korupsi data sensor/polutan (`NULL` handling), serta ukuran binary kontainer produksi yang sangat ringkas (~20 MB).
 
 ### 1. High-Level System Architecture Diagram
 
@@ -63,28 +64,28 @@ flowchart TB
         Nginx["Nginx Reverse Proxy\n(TLS/HTTPS • Rate Limiting • Static Assets)"]
     end
 
-    subgraph Backend["⚙️ FastAPI Modular Monolith (/api/v1)"]
-        API["API Routers Layer\n(auth, users, locations, weather, rain,\nair_quality, uv, alerts, flood, insights, travel, community)"]
+    subgraph Backend["⚙️ Golang Modular Monolith (Gin + Clean Architecture)"]
+        API["HTTP Handlers & Middleware (/api/v1)\n(JWT Auth, Rate Limit, Request Validator)"]
         Services["Domain Services Layer\n(Weather Engine • Rain Prediction • Alert Engine\nAI Analysis Adapter • Spatial Flood & Travel Service)"]
-        Repos["Repository & ORM Layer\n(SQLAlchemy 2.0 Async + GeoAlchemy2 + Alembic)"]
+        Repos["Repository & Spatial Data Layer\n(pgx/v5 Pool • PostGIS SQL • golang-migrate)"]
     end
 
-    subgraph AsyncWorkers["⏱️ Background Workers & Scheduler"]
-        Beat["Celery Beat\n(Periodic Ingestion & Alert Evaluation Scheduler)"]
-        Worker["Celery Workers\n(Data Normalization • Rain Nowcasting • Push Dispatch)"]
+    subgraph AsyncWorkers["⏱️ Go Background Workers & Scheduler (Asynq)"]
+        Scheduler["Asynq Scheduler (Cron)\n(Periodic Ingestion & Alert Evaluation Trigger)"]
+        Worker["Asynq Concurrent Workers\n(Goroutine Data Normalization • Rain Nowcasting • Push Dispatch)"]
     end
 
     subgraph DataStore["🗄️ Persistence & Caching Layer"]
         Postgres[("PostgreSQL 16 + PostGIS\n(Spatial Point 4326 • Relational & JSONB)")]
-        Redis[("Redis 7\n(Hot Weather Cache • Rate Limit • Celery Broker)")]
+        Redis[("Redis 7\n(Hot Weather Cache • Rate Limit • Asynq Broker)")]
     end
 
     subgraph External["☁️ External Data Providers & Services"]
         BMKG["BMKG Open Data\n(Forecast & Extreme Weather Warnings)"]
         OWM["OpenWeather / Tomorrow.io\n(Minutely Rain • AQI • UV Index)"]
         FloodSrc["BNPB / BPBD & Radar Tile Providers\n(Official Flood Warnings & Precipitation Radar)"]
-        LLM["LLM Provider API\n(Adapter Pattern for Structured AI Insights)"]
-        FCM["Firebase Cloud Messaging (FCM)\n(Push Notification Delivery)"]
+        LLM["LLM Provider API\n(Go Adapter Pattern for Structured AI Insights)"]
+        FCM["Firebase Cloud Messaging (FCM)\n(Official Firebase Go SDK v4)"]
     end
 
     Mobile & Web -->|HTTPS REST / JSON| Nginx
@@ -94,13 +95,13 @@ flowchart TB
     Repos --> Postgres
     Services <-->|Cache Hit/Miss| Redis
 
-    Beat -->|Schedule Tasks| Redis
-    Redis -->|Consume Jobs| Worker
+    Scheduler -->|Enqueue Tasks| Redis
+    Redis -->|Process Jobs| Worker
     Worker --> Services
     Worker -->|Send Push| FCM
     FCM -.->|Push Alert| Mobile
 
-    Services & Worker -->|Fetch & Normalize| BMKG & OWM & FloodSrc
+    Services & Worker -->|Concurrent Fetch via errgroup| BMKG & OWM & FloodSrc
     Services -->|Validated Weather Snapshot| LLM
 ```
 
@@ -110,8 +111,8 @@ Weatherly **tidak** menggunakan AI untuk menebak angka prediksi hujan dari nol. 
 
 ```mermaid
 flowchart LR
-    A["📡 Multi-Source Weather Data\n(Temp, Minutely Rain, UV, AQI, Wind)"] --> B["🛡️ Stage 1: Deterministic Rule Engine\n(Validasi skema, normalisasi unit,\nthreshold scoring, & status ketersediaan data)"]
-    B --> C["🧠 Stage 2: AI Analysis Layer (LLM Adapter)\n(Menerima JSON snapshot tervalidasi,\nmeringkas konteks & menyusun rekomendasi)"]
+    A["📡 Multi-Source Weather Data\n(Temp, Minutely Rain, UV, AQI, Wind)"] --> B["🛡️ Stage 1: Go Deterministic Rule Engine\n(Validasi struct, normalisasi unit,\nthreshold scoring, & pointer NULL safety)"]
+    B --> C["🧠 Stage 2: AI Analysis Layer (Go LLM Adapter)\n(Menerima JSON snapshot tervalidasi,\nmeringkas konteks & menyusun rekomendasi)"]
     C --> D[("💾 PostgreSQL ai_insights\n(Simpan input_snapshot + recommendation)")]
     D --> E["📲 Smart Daily Insights\n(Rekomendasi aktivitas berkendara,\nolahraga, & peringatan dini)"]
 ```
@@ -119,7 +120,7 @@ flowchart LR
 > [!IMPORTANT]
 > **Prinsip Keamanan & Integritas Data AI:**
 > - AI hanya menerima `input_snapshot` terstruktur yang mencantumkan sumber provider, timestamp UTC, dan status kelengkapan data.
-> - Jika parameter (misal polutan `so2` atau radar menit ke-45) bernilai `NULL`, AI wajib menyatakan data tidak tersedia — bukan mengarang angka estimasi.
+> - Jika parameter (misal polutan `so2` atau radar menit ke-45) bernilai `nil` / `NULL` (direpresentasikan dengan pointer `*float64` di Go), AI wajib menyatakan data tidak tersedia — bukan mengarang angka estimasi.
 > - Tidak ada PII (*Personally Identifiable Information*) atau API secret yang pernah dimasukkan ke dalam `input_snapshot`.
 
 ---
@@ -140,11 +141,11 @@ Weatherly dibangun di atas 8 modul domain yang saling terintegrasi, dibagi ke da
 | **8** | **Community Reports** | `Supporting` | **v2.0** | Crowdsourcing laporan kondisi lokal (hujan lokal, banjir/genangan, pohon tumbang, angin kencang) lengkap dengan foto, koordinat PostGIS, sistem *up/down vote* (`UNIQUE(report_id, user_id)`), dan moderasi. |
 
 ### ✅ Cakupan Wajib MVP (Version 1.0 Checklist)
-- [ ] **User Authentication**: Registrasi, login JWT + Refresh Token, password hashing dengan Argon2, dan manajemen profil.
+- [ ] **User Authentication**: Registrasi, login JWT (`golang-jwt/jwt/v5`) + Refresh Token, password hashing dengan Argon2id (`golang.org/x/crypto/argon2`), dan manajemen profil.
 - [ ] **Location Management**: Koordinat GPS *on-open* (tanpa *background tracking* invasif) dan penyimpanan lokasi favorit berbasis PostGIS `geography(Point, 4326)`.
-- [ ] **Live Weather Engine**: Normalisasi suhu, kelembapan, kecepatan angin, dan kondisi cuaca aktual dari multi-provider.
+- [ ] **Live Weather Engine**: Normalisasi konkuren (`errgroup`) untuk suhu, kelembapan, kecepatan angin, dan kondisi cuaca aktual dari multi-provider.
 - [ ] **Rain Prediction**: Estimasi waktu turun hujan dan probabilitas presipitasi jangka pendek.
-- [ ] **Weather Alerts & Push Notification**: Alert Engine bebas duplikasi (*deduplicated*) yang terhubung ke Firebase Cloud Messaging (FCM).
+- [ ] **Weather Alerts & Push Notification**: Alert Engine bebas duplikasi (*deduplicated*) menggunakan Go Asynq Worker yang terhubung ke Firebase Cloud Messaging (FCM).
 - [ ] **UV & Air Quality**: Integrasi metrik AQI, PM2.5, PM10, dan UV Index.
 - [ ] **Cross-Platform Dashboard**: Aplikasi mobile Flutter dan dashboard web Next.js yang responsif.
 - [ ] **Weather History**: Penyimpanan dan visualisasi riwayat observasi vs. akurasi prediksi.
@@ -153,7 +154,7 @@ Weatherly dibangun di atas 8 modul domain yang saling terintegrasi, dibagi ke da
 
 ## 🗄️ Desain Database & ERD (PostgreSQL + PostGIS)
 
-Seluruh tabel menggunakan `UUID` sebagai Primary Key, menyimpan waktu dalam format `UTC`, menggunakan indeks spasial dan temporal pada kolom lokasi serta waktu observasi, dan dikelola melalui **Alembic Migrations**.
+Seluruh tabel menggunakan `UUID` sebagai Primary Key, menyimpan waktu dalam format `UTC`, menggunakan indeks spasial dan temporal pada kolom lokasi serta waktu observasi, dan dikelola melalui **`golang-migrate` SQL Migrations**.
 
 ```mermaid
 erDiagram
@@ -315,7 +316,7 @@ Seluruh endpoint berada di bawah prefix `/api/v1` dan menggunakan autentikasi `B
 
 | Domain Modul | Method | Endpoint | Deskripsi |
 | :--- | :---: | :--- | :--- |
-| **Auth** | `POST` | `/api/v1/auth/register` | Registrasi akun pengguna baru (Argon2 password hashing) |
+| **Auth** | `POST` | `/api/v1/auth/register` | Registrasi akun pengguna baru (Argon2id password hashing) |
 | **Auth** | `POST` | `/api/v1/auth/login` | Autentikasi pengguna & penerbitan JWT Access + Refresh Token |
 | **Auth** | `GET` | `/api/v1/auth/me` | Profil dan preferensi pengguna yang sedang login |
 | **Location** | `GET` | `/api/v1/locations` | Daftar lokasi pemantauan & lokasi favorit pengguna |
@@ -379,23 +380,31 @@ weatherly/
 │   ├── mobile/                     # Flutter Android Application
 │   └── web/                        # Next.js + TypeScript Web Dashboard
 │
-├── backend/                        # Python FastAPI Modular Monolith
-│   ├── app/
+├── backend/                        # Golang Modular Monolith (Clean Architecture)
+│   ├── cmd/
 │   │   ├── api/
-│   │   │   └── v1/                 # HTTP Routers (auth, users, locations, weather, rain,
-│   │   │                           # air_quality, uv, alerts, flood, insights, travel, community)
-│   │   ├── core/                   # config.py, security.py (JWT/Argon2), database.py
-│   │   ├── models/                 # SQLAlchemy + GeoAlchemy2 ORM Models
-│   │   ├── schemas/                # Pydantic v2 Request/Response Schemas
-│   │   ├── repositories/           # Database Access & Spatial Queries
-│   │   ├── services/               # Business Logic (weather, prediction, air_quality,
-│   │   │                           # flood, uv, ai, travel, community, notifications)
-│   │   ├── workers/                # Celery Tasks & Periodic Schedules
-│   │   └── main.py                 # FastAPI Application Entrypoint
-│   ├── migrations/                 # Alembic Database Migrations
-│   ├── tests/                      # Unit, Integration & Prediction Accuracy Tests
-│   ├── requirements.txt
-│   └── Dockerfile
+│   │   │   └── main.go             # Entrypoint HTTP REST Server (Gin)
+│   │   └── worker/
+│   │       └── main.go             # Entrypoint Background Worker & Scheduler (Asynq)
+│   ├── internal/
+│   │   ├── config/                 # Environment & App Configuration
+│   │   ├── database/               # PostgreSQL (pgxpool) & Redis Connection Setup
+│   │   ├── middleware/             # JWT Auth, Rate Limiter, Structured Logging, CORS
+│   │   ├── domain/                 # Core Entities & Repository/Service Interfaces
+│   │   ├── dto/                    # Request & Response Payloads + Validator
+│   │   ├── handler/                # HTTP Handlers (/api/v1: auth, users, locations,
+│   │   │                           # weather, rain, air_quality, uv, alerts, flood,
+│   │   │                           # insights, travel, community, notifications)
+│   │   ├── service/                # Business Logic (weather engine, rain prediction,
+│   │   │                           # air_quality, uv, flood, ai adapter, travel, alerts)
+│   │   ├── repository/             # PostgreSQL + PostGIS Spatial Queries (pgx)
+│   │   ├── provider/               # External Clients (BMKG, OpenWeather, BNPB, LLM, FCM)
+│   │   └── worker/                 # Asynq Task Handlers & Periodic Cron Jobs
+│   ├── migrations/                 # SQL Migrations (golang-migrate: *.up.sql / *.down.sql)
+│   ├── pkg/                        # Shared Utilities (argon2id, jwt, geo, api response)
+│   ├── go.mod
+│   ├── go.sum
+│   └── Dockerfile                  # Multi-stage Go Build -> Minimal Alpine/Distroless Binary
 │
 ├── infrastructure/
 │   ├── docker/                     # Dockerfiles & Compose overrides
@@ -411,9 +420,9 @@ weatherly/
 │
 ├── scripts/                        # Utilitas automasi database, seed & evaluasi prediksi
 ├── .github/
-│   └── workflows/                  # GitHub Actions CI/CD Pipelines (Backend, Web, Mobile, Release)
+│   └── workflows/                  # GitHub Actions CI/CD Pipelines (Go Backend, Web, Mobile)
 ├── .env.example                    # Template Environment Variables
-├── docker-compose.yml              # Local Full-Stack Orchestration (PostGIS, Redis, API, Celery, Web)
+├── docker-compose.yml              # Local Full-Stack Orchestration (PostGIS, Redis, Go API, Worker, Web)
 └── README.md
 ```
 
@@ -432,16 +441,14 @@ Weatherly menerapkan disiplin rekayasa perangkat lunak modern melalui **GitFlow 
 > **Aturan Commit & PR:** Satu fitur dikerjakan, diuji secara lokal, lalu diajukan melalui Pull Request ke `develop`. Hindari menggabungkan banyak modul yang tidak berhubungan dalam satu commit.
 
 ### 2. GitHub Actions Workflows (`.github/workflows/`)
-Repositori ini dilengkapi dengan 3 workflow otomatis di `.github/workflows/`:
+Repositori ini dilengkapi dengan workflow otomatis di `.github/workflows/`:
 1. **`ci.yml` (Continuous Integration — Monorepo Pipeline)**:
-   - **Path Filtering & Smart Change Detection**: Mengecek perubahan di `backend/`, `apps/web/`, dan `apps/mobile/`.
-   - **Backend Job**: Menjalankan *linting* (`ruff`), *type checking*, dan pengujian `pytest` dengan service container **PostgreSQL + PostGIS (`postgis/postgis:16-3.4`)** serta **Redis 7**.
+   - **Path Filtering & Smart Change Detection**: Mengecek kesiapan modul di `backend/` (`go.mod`), `apps/web/` (`package.json`), dan `apps/mobile/` (`pubspec.yaml`).
+   - **Golang Backend Job**: Menjalankan `go vet`, `golangci-lint`, migrasi database `golang-migrate`, dan `go test -v -race ./...` dengan service container **PostgreSQL + PostGIS (`postgis/postgis:16-3.4`)** serta **Redis 7**.
    - **Web Job**: Menjalankan instalasi dependensi, `tsc --noEmit` (*TypeScript check*), `eslint`, dan build verifikasi Next.js.
    - **Mobile Job**: Menjalankan `flutter analyze` dan `flutter test` untuk memastikan kualitas aplikasi Android.
-2. **`security-and-quality.yml` (Security & Secret Audit)**:
-   - Memindai kerentanan dependensi, memeriksa kebocoran *credentials/API keys*, dan memvalidasi konfigurasi Docker.
-3. **`cd-release.yml` (Continuous Delivery & Container Build)**:
-   - Membangun dan memvalidasi Docker image untuk `backend` (FastAPI + Celery) dan `web` (Next.js), serta menyiapkan *release artifact* saat tag versi (`v*.*.*`) dibuat.
+2. **`cd-release.yml` (Continuous Delivery & Container Build)**:
+   - Membangun dan memvalidasi multi-stage Docker image untuk `backend` (Go binary) dan `web` (Next.js), serta menyiapkan *release artifact* saat tag versi (`v*.*.*`) dibuat.
 
 ---
 
@@ -449,7 +456,7 @@ Repositori ini dilengkapi dengan 3 workflow otomatis di `.github/workflows/`:
 
 ### Prasyarat
 - **Docker & Docker Compose** (v2.20+)
-- **Python 3.11+** (untuk pengembangan lokal `backend/`)
+- **Go 1.23+** (untuk pengembangan lokal `backend/`)
 - **Node.js 20+** (untuk pengembangan lokal `apps/web/`)
 - **Flutter SDK 3.22+** (untuk pengembangan lokal `apps/mobile/`)
 
@@ -462,15 +469,15 @@ cd weatherly
 # 2. Salin template environment variables
 cp .env.example .env
 
-# 3. Jalankan PostgreSQL+PostGIS, Redis, FastAPI Backend, Celery Worker/Beat, dan Next.js Web
+# 3. Jalankan PostgreSQL+PostGIS, Redis, Go API Server, Go Asynq Worker, dan Next.js Web
 docker compose up --build -d
 
-# 4. Jalankan migrasi database Alembic
-docker compose exec backend alembic upgrade head
+# 4. Jalankan migrasi database SQL (golang-migrate)
+docker compose exec backend ./weatherly-migrate up
 ```
 
 Layanan akan tersedia pada:
-- **FastAPI Backend & Swagger Docs**: `http://localhost:8000/docs`
+- **Golang API Server**: `http://localhost:8080/api/v1`
 - **Next.js Web Dashboard**: `http://localhost:3000`
 - **PostgreSQL + PostGIS**: `localhost:5432`
 - **Redis Broker & Cache**: `localhost:6379`
@@ -481,8 +488,8 @@ Layanan akan tersedia pada:
 
 ```mermaid
 flowchart LR
-    P1["Phase 1 (Minggu 1–2)\nFoundation, PostGIS,\nAuth & Location API"] --> P2["Phase 2 (Minggu 3–4)\nBMKG & OpenWeather\nData Engine + Redis"]
-    P2 --> P3["Phase 3 (Minggu 5–6)\nRain Prediction, Alerts,\nCelery & FCM Push"]
+    P1["Phase 1 (Minggu 1–2)\nFoundation, Go Setup,\nPostGIS, Auth & Location API"] --> P2["Phase 2 (Minggu 3–4)\nBMKG & OpenWeather\nGo Concurrent Engine + Redis"]
+    P2 --> P3["Phase 3 (Minggu 5–6)\nRain Prediction, Alerts,\nAsynq Worker & FCM Push"]
     P3 --> P4["Phase 4 (Minggu 7–8)\nAQI, UV, Radar,\nHistory & Flood Basic"]
     P4 --> P5["Phase 5 (Minggu 9–10)\nFlutter Mobile App &\nNext.js Web Dashboard"]
     P5 --> P6["Phase 6 (Minggu 11)\nAI Weather Insights &\nAccuracy Evaluation"]
@@ -501,14 +508,14 @@ flowchart LR
 
 ## 🔒 Standar Keamanan & Reliabilitas (*Security & Reliability*)
 
-- **Authentication & Password**: JWT (*short-lived access token* + *rotating refresh token*) dan hashing password dengan **Argon2**.
+- **Authentication & Password**: JWT (`golang-jwt/jwt/v5` dengan *short-lived access token* + *rotating refresh token*) dan hashing password dengan **Argon2id** (`golang.org/x/crypto/argon2`).
 - **Location Privacy**: Tidak melakukan pelacakan lokasi latar belakang tanpa izin eksplisit; MVP menggunakan lokasi saat aplikasi dibuka (*on-open*) atau titik lokasi favorit yang disimpan pengguna.
-- **Alert Deduplication**: Setiap peringatan cuaca memiliki kunci deterministik sehingga pengguna tidak pernah menerima spam notifikasi duplikat untuk kejadian cuaca yang sama.
-- **Background Job Resilience**: Celery worker dilengkapi mekanisme *exponential backoff retry*, *timeout guard*, dan *graceful degradation* ketika salah satu API cuaca eksternal mengalami gangguan.
+- **Alert Deduplication**: Setiap peringatan cuaca memiliki kunci deterministik (`dedup_key`) sehingga pengguna tidak pernah menerima spam notifikasi duplikat untuk kejadian cuaca yang sama.
+- **Background Job Resilience**: Worker Go (`Asynq`) dilengkapi mekanisme *exponential backoff retry*, *context timeout guard*, dan *graceful degradation* ketika salah satu API cuaca eksternal mengalami gangguan.
 
 ---
 
 <div align="center">
   <b>Weatherly Platform</b> — Built as a Production-Grade Full-Stack Weather Intelligence Portfolio.<br/>
-  <sub>Initial Region Focus: Bandung & West Java, Indonesia 🇮🇩</sub>
+  <sub>Powered by Golang, PostgreSQL/PostGIS, Redis, Next.js, and Flutter • Initial Region: Bandung, Indonesia 🇮🇩</sub>
 </div>

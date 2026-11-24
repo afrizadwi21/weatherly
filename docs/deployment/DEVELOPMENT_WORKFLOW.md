@@ -1,6 +1,6 @@
-# 🔄 Panduan Engineering Workflow & Standar Pengembangan Weatherly
+# 🔄 Panduan Engineering Workflow & Standar Pengembangan Weatherly (Golang Edition)
 
-Dokumen ini mendefinisikan alur kerja (*workflow*) pengembangan untuk monorepo **Weatherly**, mulai dari konfigurasi keputusan teknis, strategi Git branching, konvensi commit, hingga tahapan eksekusi per fitur.
+Dokumen ini mendefinisikan alur kerja (*workflow*) pengembangan untuk monorepo **Weatherly**, mulai dari konfigurasi keputusan teknis berbasis **Golang**, strategi Git branching, konvensi commit, hingga tahapan eksekusi per fitur.
 
 ---
 
@@ -10,10 +10,10 @@ Berdasarkan blueprint final Weatherly, konfigurasi pengembangan yang ditetapkan 
 
 | Aspek | Keputusan yang Digunakan | Alasan Teknis |
 | :--- | :--- | :--- |
-| **1. Struktur Repository** | **Monorepo** (`apps/mobile`, `apps/web`, `backend`, `infrastructure`, `docs`) | Memudahkan sinkronisasi kontrak API antara FastAPI, Next.js, dan Flutter dalam satu PR serta menyederhanakan CI/CD. |
-| **2. Database** | **PostgreSQL 16 + PostGIS** | Mendukung tipe data spasial `geography(Point, 4326)` untuk query radius banjir (`ST_DWithin`), laporan komunitas terdekat, dan koridor rute perjalanan. |
-| **3. Proses Desain & UI** | **Component-Driven UI selaras dengan kontrak API** | Membangun komponen dashboard modular (Current Weather, Rain Timeline, Radar Map, AQI/UV Card, AI Insights) secara bertahap mengikuti kesiapan endpoint backend. |
-| **4. Cara Pengerjaan** | **Iteratif Bertahap (Satu Fitur Selesai & Dites Sebelum Lanjut)** | Mencegah *half-baked features*. Setiap fitur diselesaikan dari migrasi DB $\rightarrow$ Repository $\rightarrow$ Service $\rightarrow$ API Endpoint $\rightarrow$ Automated Test sebelum lanjut ke fitur berikutnya. |
+| **1. Struktur Repository** | **Monorepo** (`apps/mobile`, `apps/web`, `backend`, `infrastructure`, `docs`) | Memudahkan sinkronisasi kontrak API antara backend Golang, Next.js, dan Flutter dalam satu PR serta menyederhanakan CI/CD. |
+| **2. Backend Stack** | **Golang 1.23+ (Gin + pgx/v5 + Asynq + golang-migrate)** | Konkurensi tinggi (`goroutines`) untuk multi-provider weather ingestion, *compile-time type safety* untuk *null handling*, serta binary Docker yang sangat ringan (~20 MB). |
+| **3. Database** | **PostgreSQL 16 + PostGIS** | Mendukung tipe data spasial `geography(Point, 4326)` untuk query radius banjir (`ST_DWithin`), laporan komunitas terdekat, dan koridor rute perjalanan. |
+| **4. Cara Pengerjaan** | **Iteratif Bertahap (Satu Fitur Selesai & Dites Sebelum Lanjut)** | Mencegah *half-baked features*. Setiap fitur diselesaikan dari migrasi SQL $\rightarrow$ Repository $\rightarrow$ Service $\rightarrow$ Gin Handler $\rightarrow$ Go Test (`-race`) sebelum lanjut ke fitur berikutnya. |
 
 ---
 
@@ -29,9 +29,9 @@ flowchart LR
     Fix1["fix/notification-duplicate"]
 
     Dev --> Feat1 & Feat2 & Feat3
-    Feat1 & Feat2 & Feat3 -->|Pull Request + CI Green| Dev
+    Feat1 & Feat2 & Feat3 -->|Pull Request + Go CI Green| Dev
     Dev --> Fix1
-    Fix1 -->|Pull Request + CI Green| Dev
+    Fix1 -->|Pull Request + Go CI Green| Dev
     Dev -->|Release Tag v1.0.0| Main
 ```
 
@@ -50,11 +50,11 @@ flowchart LR
 
 ### Konvensi Pesan Commit (*Conventional Commits*)
 Gunakan format commit yang bersih dan deskriptif:
-- `feat(rain): add 60-minute precipitation arrival time estimator`
-- `feat(db): create initial postgis migration for core and environmental tables`
+- `feat(rain): add 60-minute precipitation arrival time estimator in go`
+- `feat(db): create initial postgis sql migration for core and environmental tables`
 - `fix(alerts): prevent duplicate fcm push within 45-minute cooldown window`
-- `docs(architecture): add two-stage ai pipeline and postgis erd diagrams`
-- `ci(github): configure postgis and redis service containers for pytest`
+- `docs(architecture): update backend specification to golang clean architecture`
+- `ci(github): configure go 1.23, golangci-lint, postgis and redis service containers`
 
 ---
 
@@ -62,17 +62,16 @@ Gunakan format commit yang bersih dan deskriptif:
 
 Setiap kali mengerjakan satu modul di Weatherly, ikuti 6 langkah standar berikut:
 
-1. **Database & Migration (`backend/app/models/` & `backend/migrations/`)**
-   - Definisikan model SQLAlchemy/GeoAlchemy2 dengan `UUID`, timestamp `UTC`, dan constraint yang tepat.
-   - Buat dan uji migrasi Alembic (`alembic revision --autogenerate` & `alembic upgrade head`).
-2. **Repository & Spatial Query (`backend/app/repositories/`)**
-   - Tulis fungsi query database yang terisolasi dari HTTP layer.
-3. **Service & Business Logic (`backend/app/services/`)**
-   - Implementasikan normalisasi data, validasi threshold, atau adapter provider eksternal.
-   - Pastikan nilai yang tidak tersedia dari provider tetap `NULL`.
-4. **Schema & API Endpoint (`backend/app/schemas/` & `backend/app/api/v1/`)**
-   - Buat kontrak request/response Pydantic v2 dan ekspos endpoint di bawah `/api/v1/...`.
-5. **Automated Testing (`backend/tests/`)**
-   - Tambahkan unit test untuk logika bisnis dan integration test untuk endpoint API.
+1. **Database & SQL Migration (`backend/migrations/` & `backend/internal/domain/`)**
+   - Buat file migrasi SQL `XXXXXX_<feature>.up.sql` dan `.down.sql` dengan `UUID`, timestamp `UTC`, dan indeks spasial PostGIS.
+   - Definisikan entity struct di `internal/domain/` (gunakan pointer `*float64` untuk metrik opsional yang bisa `NULL`).
+2. **Repository & Spatial Query (`backend/internal/repository/`)**
+   - Tulis query SQL menggunakan `pgx/v5` yang terisolasi dari HTTP layer.
+3. **Service & Business Logic (`backend/internal/service/` & `backend/internal/provider/`)**
+   - Implementasikan normalisasi data konkuren (`errgroup`), validasi threshold, atau adapter provider eksternal.
+4. **DTO & HTTP Handler (`backend/internal/dto/` & `backend/internal/handler/`)**
+   - Buat struct request/response DTO dengan validasi dan ekspos endpoint Gin di bawah `/api/v1/...`.
+5. **Automated Testing (`backend/internal/.../*_test.go`)**
+   - Tambahkan unit test dan integration test, lalu jalankan `go test -v -race ./...`.
 6. **Client Integration (`apps/web/` & `apps/mobile/`)**
    - Hubungkan endpoint yang sudah teruji ke komponen UI Next.js dan Flutter.

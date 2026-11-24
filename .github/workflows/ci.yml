@@ -31,7 +31,7 @@ jobs:
       - name: Check modified paths
         id: filter
         run: |
-          if [ -d "backend" ] && [ -f "backend/requirements.txt" ]; then
+          if [ -d "backend" ] && [ -f "backend/go.mod" ]; then
             echo "backend=true" >> $GITHUB_OUTPUT
           else
             echo "backend=false" >> $GITHUB_OUTPUT
@@ -48,7 +48,7 @@ jobs:
           fi
 
   backend-ci:
-    name: "Backend CI (FastAPI + PostGIS + Redis)"
+    name: "Backend CI (Golang + PostGIS + Redis)"
     needs: changes
     if: needs.changes.outputs.backend == 'true'
     runs-on: ubuntu-latest
@@ -86,41 +86,48 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+      - name: Set up Go 1.23
+        uses: actions/setup-go@v5
         with:
-          python-version: "3.11"
-          cache: "pip"
-          cache-dependency-path: backend/requirements.txt
+          go-version: "1.23"
+          cache-dependency-path: backend/go.sum
 
-      - name: Install Dependencies & Linter
+      - name: Download Go Modules & Verify
         run: |
-          python -m pip install --upgrade pip
-          pip install ruff pytest pytest-asyncio httpx
-          pip install -r requirements.txt
+          go mod download
+          go mod verify
 
-      - name: Run Ruff Linter & Formatter Check
+      - name: Run Go Vet & Format Check
         run: |
-          ruff check .
-          ruff format --check .
+          test -z "$(gofmt -l .)"
+          go vet ./...
 
-      - name: Run Alembic Migrations Check
-        if: hashFiles('backend/alembic.ini') != ''
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+          working-directory: backend
+
+      - name: Run Database Migrations (golang-migrate)
+        if: hashFiles('backend/migrations/*.sql') != ''
         env:
-          DATABASE_URL: postgresql+asyncpg://weatherly_test:weatherly_test_password@localhost:5432/weatherly_test_db
-          REDIS_URL: redis://localhost:6379/0
-          JWT_SECRET_KEY: ci-test-secret-key-do-not-use-in-prod
+          DATABASE_URL: postgres://weatherly_test:weatherly_test_password@localhost:5432/weatherly_test_db?sslmode=disable
         run: |
-          alembic upgrade head
+          go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+          migrate -path ./migrations -database "$DATABASE_URL" up
 
-      - name: Run Pytest Suite
-        env:
-          DATABASE_URL: postgresql+asyncpg://weatherly_test:weatherly_test_password@localhost:5432/weatherly_test_db
-          REDIS_URL: redis://localhost:6379/0
-          JWT_SECRET_KEY: ci-test-secret-key-do-not-use-in-prod
-          ENVIRONMENT: test
+      - name: Build API & Worker Binaries
         run: |
-          pytest --maxfail=1 --disable-warnings -q
+          go build -v ./cmd/...
+
+      - name: Run Go Tests with Race Detector
+        env:
+          DATABASE_URL: postgres://weatherly_test:weatherly_test_password@localhost:5432/weatherly_test_db?sslmode=disable
+          REDIS_ADDR: localhost:6379
+          JWT_SECRET_KEY: ci-test-secret-key-do-not-use-in-prod
+          APP_ENV: test
+        run: |
+          go test -v -race -coverprofile=coverage.out ./...
 
   web-ci:
     name: "Web CI (Next.js + TypeScript)"
@@ -153,7 +160,7 @@ jobs:
 
       - name: Build Next.js Production Bundle
         env:
-          NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api/v1
+          NEXT_PUBLIC_API_BASE_URL: http://localhost:8080/api/v1
         run: npm run build
 
   mobile-ci:
