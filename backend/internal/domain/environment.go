@@ -29,15 +29,15 @@ type AirQualityHistoryResponse struct {
 
 // UVObservation represents normalized UV index and skin protection recommendation.
 type UVObservation struct {
-	LocationID           string    `json:"location_id"`
-	LocationName         string    `json:"location_name"`
-	UVIndex              float64   `json:"uv_index"`
-	UVCategory           string    `json:"uv_category"`
-	PeakHoursWindow      string    `json:"peak_hours_window"`
-	ProtectionAdvice     string    `json:"protection_advice"`
-	RecommendedSPF       int       `json:"recommended_spf"`
-	Provider             string    `json:"provider"`
-	ObservedAt           time.Time `json:"observed_at"`
+	LocationID       string    `json:"location_id"`
+	LocationName     string    `json:"location_name"`
+	UVIndex          float64   `json:"uv_index"`
+	UVCategory       string    `json:"uv_category"`
+	PeakHoursWindow  string    `json:"peak_hours_window"`
+	ProtectionAdvice string    `json:"protection_advice"`
+	RecommendedSPF   int       `json:"recommended_spf"`
+	Provider         string    `json:"provider"`
+	ObservedAt       time.Time `json:"observed_at"`
 }
 
 // UVForecastPoint represents an hourly UV index forecast entry.

@@ -36,12 +36,12 @@ type RegisterDeviceRequest struct {
 
 // NotificationLog represents a deduplicated push notification dispatch record.
 type NotificationLog struct {
-	ID        string    `json:"id"`
-	AlertID   string    `json:"alert_id"`
-	DeviceID  string    `json:"device_id"`
-	UserID    string    `json:"user_id"`
-	Title     string    `json:"title"`
-	Body      string    `json:"body"`
-	Status    string    `json:"status"`
-	SentAt    time.Time `json:"sent_at"`
+	ID       string    `json:"id"`
+	AlertID  string    `json:"alert_id"`
+	DeviceID string    `json:"device_id"`
+	UserID   string    `json:"user_id"`
+	Title    string    `json:"title"`
+	Body     string    `json:"body"`
+	Status   string    `json:"status"`
+	SentAt   time.Time `json:"sent_at"`
 }

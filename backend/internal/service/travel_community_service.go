@@ -11,9 +11,9 @@ import (
 )
 
 var (
-	ErrRouteNotFound   = errors.New("travel route not found")
-	ErrReportNotFound  = errors.New("community report not found")
-	ErrAlreadyVoted    = errors.New("user has already voted on this community report")
+	ErrRouteNotFound  = errors.New("travel route not found")
+	ErrReportNotFound = errors.New("community report not found")
+	ErrAlreadyVoted   = errors.New("user has already voted on this community report")
 )
 
 // TravelCommunityService manages Smart Travel corridors and Community Reports with unique voting.

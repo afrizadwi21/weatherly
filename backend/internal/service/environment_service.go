@@ -22,7 +22,7 @@ func (s *EnvironmentService) GetCurrentAirQuality(loc domain.Location) domain.Ai
 	o3 := 41.5
 	co := 310.0
 	// SO2 is intentionally left nil (NULL) when not reported by the regional station.
-	var so2 *float64 = nil
+	var so2 *float64
 
 	aqi := 74
 	cat, rec := classifyAQI(aqi)

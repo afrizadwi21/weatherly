@@ -35,11 +35,11 @@ type RouteWaypointWeather struct {
 
 // RouteWeatherResponse represents GET /api/v1/travel/{id}/weather.
 type RouteWeatherResponse struct {
-	Route                TravelRoute            `json:"route"`
-	OverallRainRisk      string                 `json:"overall_rain_risk"`
-	DepartureAdvice      string                 `json:"departure_advice"`
-	Waypoints            []RouteWaypointWeather `json:"waypoints"`
-	GeneratedAt          time.Time              `json:"generated_at"`
+	Route           TravelRoute            `json:"route"`
+	OverallRainRisk string                 `json:"overall_rain_risk"`
+	DepartureAdvice string                 `json:"departure_advice"`
+	Waypoints       []RouteWaypointWeather `json:"waypoints"`
+	GeneratedAt     time.Time              `json:"generated_at"`
 }
 
 // CommunityReport represents a user-submitted local weather or hazard report.
