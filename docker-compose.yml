@@ -1,0 +1,87 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: weatherly-postgis
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-weatherly}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-weatherly_secret_password}
+      POSTGRES_DB: ${POSTGRES_DB:-weatherly_db}
+      TZ: ${APP_TIMEZONE:-Asia/Jakarta}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - weatherly_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-weatherly} -d ${POSTGRES_DB:-weatherly_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - weatherly-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: weatherly-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - weatherly_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - weatherly-net
+
+  migrate:
+    image: migrate/migrate:v4.17.1
+    container_name: weatherly-migrate
+    profiles:
+      - tools
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend/migrations:/migrations:ro
+    entrypoint:
+      - migrate
+      - -path=/migrations
+      - -database=postgres://${POSTGRES_USER:-weatherly}:${POSTGRES_PASSWORD:-weatherly_secret_password}@postgres:5432/${POSTGRES_DB:-weatherly_db}?sslmode=disable
+    networks:
+      - weatherly-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: weatherly-api
+    restart: unless-stopped
+    profiles:
+      - app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      APP_PORT: ${APP_PORT:-8080}
+      DATABASE_URL: postgres://${POSTGRES_USER:-weatherly}:${POSTGRES_PASSWORD:-weatherly_secret_password}@postgres:5432/${POSTGRES_DB:-weatherly_db}?sslmode=disable
+      REDIS_ADDR: redis:6379
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-replace-with-32-byte-minimum-cryptographic-secret-key}
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    networks:
+      - weatherly-net
+
+volumes:
+  weatherly_pgdata:
+  weatherly_redisdata:
+
+networks:
+  weatherly-net:
+    driver: bridge
