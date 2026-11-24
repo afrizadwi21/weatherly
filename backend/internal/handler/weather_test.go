@@ -61,4 +61,34 @@ func TestWeatherAndRainEndpoints(t *testing.T) {
 			t.Errorf("expected rain prediction with 6 minutely points and arrival time, got %+v", pred)
 		}
 	})
+
+	t.Run("GET /api/v1/air-quality/current preserves NULL for missing SO2", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/api/v1/air-quality/current", nil)
+		rec := httptest.NewRecorder()
+		mux.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusOK {
+			t.Fatalf("expected 200 OK, got %d", rec.Code)
+		}
+		var aqi domain.AirQualityObservation
+		_ = json.NewDecoder(rec.Body).Decode(&aqi)
+		if aqi.AQI <= 0 || aqi.PM25 == nil || aqi.SO2 != nil {
+			t.Errorf("expected non-null PM25 and nil SO2, got %+v", aqi)
+		}
+	})
+
+	t.Run("GET /api/v1/uv/current and /uv/forecast", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/api/v1/uv/current", nil)
+		rec := httptest.NewRecorder()
+		mux.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusOK {
+			t.Fatalf("expected 200 OK, got %d", rec.Code)
+		}
+		var uv domain.UVObservation
+		_ = json.NewDecoder(rec.Body).Decode(&uv)
+		if uv.UVIndex <= 0 || uv.UVCategory == "" {
+			t.Errorf("unexpected UV observation: %+v", uv)
+		}
+	})
 }
