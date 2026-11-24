@@ -130,4 +130,26 @@ func TestWeatherAndRainEndpoints(t *testing.T) {
 			t.Errorf("unexpected daily insights response: %+v", insights)
 		}
 	})
+
+	t.Run("Smart Travel corridor and Community Report unique vote constraint", func(t *testing.T) {
+		tcSvc := service.NewTravelCommunityService()
+		route := tcSvc.CreateRoute("user-1", domain.CreateTravelRouteRequest{
+			RouteName:      "Dago ke Buahbatu",
+			OriginLat:      -6.8850,
+			OriginLon:      107.6135,
+			DestinationLat: -6.9500,
+			DestinationLon: 107.6340,
+		})
+		analysis, err := tcSvc.AnalyzeRouteWeather(route.ID)
+		if err != nil || len(analysis.Waypoints) != 3 {
+			t.Fatalf("expected 3 route waypoints, got err=%v waypoints=%d", err, len(analysis.Waypoints))
+		}
+
+		if _, err := tcSvc.VoteReport("comm-bdg-01", "user-1", "upvote"); err != nil {
+			t.Fatalf("expected first vote to succeed, got %v", err)
+		}
+		if _, err := tcSvc.VoteReport("comm-bdg-01", "user-1", "upvote"); err == nil {
+			t.Errorf("expected duplicate vote by same user to be rejected")
+		}
+	})
 }

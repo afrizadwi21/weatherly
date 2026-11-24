@@ -28,6 +28,7 @@ func NewMux(cfg *config.Config) *http.ServeMux {
 	envSvc := service.NewEnvironmentService()
 	alertSvc := service.NewAlertService()
 	intelSvc := service.NewIntelligenceService(weatherSvc, envSvc)
+	travelCommSvc := service.NewTravelCommunityService()
 
 	authHandler := NewAuthHandler(cfg, store)
 	locHandler := NewLocationHandler(cfg, store)
@@ -35,6 +36,7 @@ func NewMux(cfg *config.Config) *http.ServeMux {
 	envHandler := NewEnvironmentHandler(weatherHandler, envSvc)
 	alertHandler := NewAlertHandler(cfg, alertSvc)
 	intelHandler := NewIntelligenceHandler(weatherHandler, intelSvc)
+	travelCommHandler := NewTravelCommunityHandler(cfg, travelCommSvc)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/health", HealthHandler(cfg))
@@ -66,6 +68,12 @@ func NewMux(cfg *config.Config) *http.ServeMux {
 	mux.HandleFunc("POST /api/v1/flood/reports", intelHandler.CreateFloodReport)
 	mux.HandleFunc("GET /api/v1/insights/daily", intelHandler.DailyInsights)
 	mux.HandleFunc("POST /api/v1/insights/generate", intelHandler.GenerateInsights)
+
+	mux.HandleFunc("POST /api/v1/travel/routes", travelCommHandler.CreateRoute)
+	mux.HandleFunc("GET /api/v1/travel/{id}/weather", travelCommHandler.GetRouteWeather)
+	mux.HandleFunc("GET /api/v1/community/reports", travelCommHandler.ListCommunityReports)
+	mux.HandleFunc("POST /api/v1/community/reports", travelCommHandler.CreateCommunityReport)
+	mux.HandleFunc("POST /api/v1/community/reports/{id}/vote", travelCommHandler.VoteCommunityReport)
 	return mux
 }
 
