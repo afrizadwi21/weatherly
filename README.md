@@ -456,7 +456,7 @@ Repositori ini dilengkapi dengan 3 workflow otomatis di `.github/workflows/`:
 ### Menjalankan Seluruh Infrastruktur dengan Docker Compose
 ```bash
 # 1. Clone repository
-git clone https://github.com/afriza/weatherly.git
+git clone git@github.com:afrizadwi21/weatherly.git
 cd weatherly
 
 # 2. Salin template environment variables
