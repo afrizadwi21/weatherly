@@ -1,0 +1,69 @@
+# ==============================================================================
+# WEATHERLY MONOREPO — GITIGNORE
+# ==============================================================================
+
+# 1. Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+service-account*.json
+firebase-adminsdk*.json
+
+# 2. Golang Backend (backend/)
+backend/bin/
+backend/dist/
+backend/tmp/
+backend/weatherly-api
+backend/weatherly-worker
+backend/coverage.out
+backend/coverage.html
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+go.work.sum
+
+# 3. Next.js Web App (apps/web/)
+node_modules/
+apps/web/.next/
+apps/web/out/
+apps/web/build/
+apps/web/coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.tsbuildinfo
+next-env.d.ts
+
+# 4. Flutter Mobile App (apps/mobile/)
+apps/mobile/.dart_tool/
+apps/mobile/.flutter-plugins
+apps/mobile/.flutter-plugins-dependencies
+apps/mobile/.packages
+apps/mobile/build/
+apps/mobile/ios/Pods/
+apps/mobile/android/.gradle/
+apps/mobile/android/local.properties
+*.iml
+*.ipr
+*.iws
+
+# 5. Docker, OS & Editor Files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+*.swp
+*.swo
+*~
+postgres_data/
+redis_data/
