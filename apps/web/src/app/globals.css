@@ -1,37 +1,28 @@
 /* ============================================================================
-   WEATHERLY — WEATHER INTELLIGENCE PLATFORM STYLESHEET
-   Designed specifically around the Weatherly Product Blueprint (8 Modules)
+   WEATHERLY — SYNOPTIC METEOROLOGICAL FOLIO & SPLIT-FLAP GRID
+   Zero blue/cyan gradients, zero button glows, zero nested floating cards.
    ============================================================================ */
 
 :root {
-  --bg-deep: #070d19;
-  --bg-surface: #0e172a;
-  --bg-elevated: #15223c;
-  --bg-interactive: #1c2d4f;
-  --border-subtle: rgba(148, 179, 228, 0.16);
-  --border-highlight: rgba(34, 211, 238, 0.45);
+  --paper: #f6f5f1;
+  --paper-alt: #eeece6;
+  --paper-hover: #e5e2da;
+  --ink: #141413;
+  --ink-secondary: #4a4946;
+  --ink-muted: #76746f;
+  --rule: #d4d1c8;
+  --rule-strong: #141413;
 
-  --text-primary: #f4f7fb;
-  --text-secondary: #a8bbd8;
-  --text-muted: #6f86ab;
-
-  --accent-cyan: #22d3ee;
-  --accent-sky: #38bdf8;
-  --accent-emerald: #10b981;
-  --accent-amber: #f59e0b;
-  --accent-coral: #f43f5e;
+  --signal-red: #c93b2b;
+  --signal-red-Tint: #fbeae8;
+  --signal-amber: #b86b14;
+  --signal-amber-tint: #fdf3e7;
+  --signal-green: #1f6b45;
+  --signal-green-tint: #eaf5ef;
 
   --font-display: var(--font-space-grotesk), "Plus Jakarta Sans", system-ui, sans-serif;
   --font-body: var(--font-jakarta), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-jetbrains-mono), monospace;
-
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 22px;
-  --radius-pill: 9999px;
-
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 *,
@@ -41,49 +32,32 @@
 }
 
 html {
-  background-color: var(--bg-deep);
-  color: var(--text-primary);
+  background-color: var(--paper);
+  color: var(--ink);
   font-family: var(--font-body);
-  color-scheme: dark;
-  scroll-behavior: smooth;
+  color-scheme: light;
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 18% 0%, rgba(34, 211, 238, 0.11) 0%, transparent 45%),
-    radial-gradient(circle at 82% 8%, rgba(56, 189, 248, 0.09) 0%, transparent 48%),
-    var(--bg-deep);
-  color: var(--text-primary);
+  background-color: var(--paper);
+  color: var(--ink);
   font-size: 0.9375rem;
   line-height: 1.55;
   overflow-x: hidden;
-  caret-color: var(--accent-cyan);
+  caret-color: var(--signal-red);
 }
 
 ::selection {
-  background-color: var(--accent-cyan);
-  color: var(--bg-deep);
-}
-
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-deep);
-}
-
-::-webkit-scrollbar-thumb {
-  background: #233559;
-  border-radius: var(--radius-pill);
+  background-color: var(--ink);
+  color: var(--paper);
 }
 
 :focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--bg-deep), 0 0 0 4px var(--accent-cyan);
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 
 .tabular-nums {
@@ -91,606 +65,554 @@ body {
 }
 
 /* ============================================================================
-   LAYOUT CONTAINER & TOP ATMOSPHERIC HERO WITH MOVING CLOUDS
+   MASTER RULED FOLIO SHEET (NO FLOATING CARDS, EXPOSED 1PX CONSTRUCTION GRID)
    ============================================================================ */
 
-.weatherly-app {
+.folio-wrapper {
   max-width: 1360px;
   margin: 0 auto;
-  padding: 20px 24px 64px;
+  padding: 24px;
 }
 
-.hero-observatory {
+.folio-sheet {
+  border: 1px solid var(--rule-strong);
+  background-color: var(--paper);
+}
+
+/* Top Utility Status Strip */
+.folio-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--rule-strong);
+  background-color: var(--paper-alt);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink-secondary);
+}
+
+/* ============================================================================
+   MASTHEAD WITH SUBTLE ARCHITECTURAL DRIFTING CLOUDS BEHIND "WEATHERLY"
+   ============================================================================ */
+
+.masthead-stage {
   position: relative;
   overflow: hidden;
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--border-subtle);
-  background: linear-gradient(165deg, #15284c 0%, #0d1830 58%, #091020 100%);
-  padding: 24px 28px;
-  margin-bottom: 18px;
-  box-shadow: 0 20px 50px -15px rgba(3, 7, 16, 0.85);
-}
-
-/* Multi-layer Drifting Clouds Behind "WEATHERLY" */
-.sky-canvas {
-  position: relative;
-  padding: 18px 0 22px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  border-bottom: 1px solid var(--rule-strong);
+  background-color: var(--paper);
+  padding: 36px 24px 28px;
   isolation: isolate;
 }
 
-.drifting-cloud {
+.cloud-layer {
   position: absolute;
   pointer-events: none;
   user-select: none;
   will-change: transform;
 }
 
-.drifting-cloud--layer1 {
-  top: -8px;
-  left: -10%;
-  width: 120%;
-  height: 150px;
-  z-index: 1;
-  opacity: 0.55;
-  animation: driftEast 36s ease-in-out infinite alternate;
-}
-
-.drifting-cloud--layer2 {
-  top: 6px;
-  left: -12%;
-  width: 124%;
-  height: 150px;
-  z-index: 2;
-  opacity: 0.72;
-  animation: driftWest 28s ease-in-out infinite alternate;
-}
-
-.drifting-cloud--layer3 {
-  bottom: 4px;
+.cloud-layer--back {
+  top: 4px;
   left: -8%;
   width: 116%;
-  height: 110px;
+  height: 135px;
+  z-index: 1;
+  animation: cloudSlideRight 44s linear infinite alternate;
+}
+
+.cloud-layer--mid {
+  top: 14px;
+  left: -10%;
+  width: 120%;
+  height: 140px;
+  z-index: 2;
+  animation: cloudSlideLeft 32s linear infinite alternate;
+}
+
+.cloud-layer--front {
+  bottom: 12px;
+  left: -6%;
+  width: 112%;
+  height: 95px;
   z-index: 4;
-  opacity: 0.45;
-  animation: driftEast 22s ease-in-out infinite alternate;
+  animation: cloudSlideRight 26s linear infinite alternate;
 }
 
-@keyframes driftEast {
+@keyframes cloudSlideRight {
   0% {
-    transform: translate3d(-45px, 0, 0);
+    transform: translate3d(-36px, 0, 0);
   }
   100% {
-    transform: translate3d(45px, 0, 0);
+    transform: translate3d(36px, 0, 0);
   }
 }
 
-@keyframes driftWest {
+@keyframes cloudSlideLeft {
   0% {
-    transform: translate3d(45px, 0, 0);
+    transform: translate3d(36px, 0, 0);
   }
   100% {
-    transform: translate3d(-45px, 0, 0);
+    transform: translate3d(-36px, 0, 0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .drifting-cloud--layer1,
-  .drifting-cloud--layer2,
-  .drifting-cloud--layer3 {
+  .cloud-layer--back,
+  .cloud-layer--mid,
+  .cloud-layer--front {
     animation: none;
   }
 }
 
-.brand-badge-row {
-  position: relative;
-  z-index: 5;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 14px;
-  border-radius: var(--radius-pill);
-  background: rgba(14, 23, 42, 0.75);
-  border: 1px solid rgba(34, 211, 238, 0.35);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--accent-cyan);
-  margin-bottom: 10px;
-}
-
-.pulse-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--accent-emerald);
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.22);
-}
-
-.brand-title {
+.masthead-inner {
   position: relative;
   z-index: 3;
-  font-family: var(--font-display);
-  font-size: clamp(2.75rem, 6.2vw, 4.75rem);
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 0.98;
-  margin: 0;
-  color: #ffffff;
-  text-shadow:
-    0 10px 30px rgba(7, 13, 25, 0.9),
-    0 2px 8px rgba(34, 211, 238, 0.22);
-}
-
-.brand-motto {
-  position: relative;
-  z-index: 5;
-  margin: 10px auto 0;
-  max-width: 68ch;
-  color: var(--text-secondary);
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-/* Top Navigation Bar inside Hero */
-.hero-controls-bar {
-  position: relative;
-  z-index: 5;
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: 14px;
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border-subtle);
+  gap: 20px;
 }
 
-.location-switcher {
+.masthead-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 7vw, 5.25rem);
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  color: var(--ink);
+  margin: 0;
+}
+
+.masthead-lead {
+  max-width: 48ch;
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--ink-secondary);
+  line-height: 1.45;
+}
+
+/* Location Switcher Bar (Flush Tabbed Rail, Zero Glow) */
+.location-rail {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
+  align-items: stretch;
+  border-bottom: 1px solid var(--rule-strong);
+  background-color: var(--paper-alt);
 }
 
-.loc-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 15px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border-subtle);
-  background: rgba(14, 23, 42, 0.72);
-  color: var(--text-secondary);
+.location-tab {
+  appearance: none;
+  border: none;
+  border-right: 1px solid var(--rule);
+  background: transparent;
+  color: var(--ink-secondary);
+  padding: 12px 20px;
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.16s var(--ease-out);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.12s ease, color 0.12s ease;
 }
 
-.loc-chip:hover {
-  color: var(--text-primary);
-  border-color: var(--accent-cyan);
-  background: var(--bg-interactive);
+.location-tab:hover {
+  background-color: var(--paper-hover);
+  color: var(--ink);
 }
 
-.loc-chip[aria-pressed="true"] {
-  background: var(--accent-cyan);
-  color: var(--bg-deep);
-  border-color: var(--accent-cyan);
-  box-shadow: 0 6px 20px -4px rgba(34, 211, 238, 0.55);
+.location-tab[aria-pressed="true"] {
+  background-color: var(--ink);
+  color: var(--paper);
 }
 
 /* ============================================================================
-   DECISION BANNER (ANSWERING THE 3 CORE WEATHERLY POSITIONING QUESTIONS)
+   3-COLUMN POSITIONING LEDGER (WHAT, WHEN, HOW TO PREPARE)
    ============================================================================ */
 
-.decision-trio-grid {
+.ledger-trio {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  margin-bottom: 18px;
+  border-bottom: 1px solid var(--rule-strong);
 }
 
-.decision-box {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 16px 20px;
+.ledger-cell {
+  padding: 20px 24px;
+  border-right: 1px solid var(--rule);
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.decision-box--urgent {
-  border-color: rgba(245, 158, 11, 0.5);
-  background: linear-gradient(145deg, rgba(245, 158, 11, 0.11) 0%, var(--bg-surface) 80%);
+.ledger-cell:last-child {
+  border-right: none;
 }
 
-.decision-question {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--accent-cyan);
-  font-weight: 500;
+.ledger-cell--alert {
+  background-color: var(--signal-amber-tint);
 }
 
-.decision-answer {
-  font-family: var(--font-display);
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0;
-}
-
-.decision-sub {
-  font-size: 0.83rem;
-  color: var(--text-secondary);
-  margin: 0;
-}
-
-/* ============================================================================
-   MAIN DASHBOARD GRID (BLUEPRINT SECTION 12 ARCHITECTURE)
-   ============================================================================ */
-
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 18px;
-  margin-bottom: 18px;
-}
-
-.span-8 {
-  grid-column: span 8 / span 8;
-}
-.span-7 {
-  grid-column: span 7 / span 7;
-}
-.span-6 {
-  grid-column: span 6 / span 6;
-}
-.span-5 {
-  grid-column: span 5 / span 5;
-}
-.span-4 {
-  grid-column: span 4 / span 4;
-}
-.span-12 {
-  grid-column: span 12 / span 12;
-}
-
-@media (max-width: 1120px) {
-  .span-8,
-  .span-7,
-  .span-6,
-  .span-5,
-  .span-4 {
-    grid-column: span 12 / span 12;
-  }
-  .decision-trio-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.module-panel {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.module-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.module-title-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.module-title {
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0;
-  letter-spacing: -0.015em;
-}
-
-.badge-pill {
+.cell-index {
   font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 500;
-  padding: 4px 10px;
-  border-radius: var(--radius-sm);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
-  color: var(--accent-cyan);
+  color: var(--ink-muted);
+  letter-spacing: 0.02em;
+}
+
+.cell-headline {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--ink);
+}
+
+.cell-copy {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ink-secondary);
+}
+
+/* ============================================================================
+   MAIN RULED WORKSPACE GRID (12 COLUMNS, EXPOSED HAIRLINES)
+   ============================================================================ */
+
+.ruled-row {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.ruled-row:last-child {
+  border-bottom: none;
+}
+
+.grid-col-7 {
+  grid-column: span 7 / span 7;
+  border-right: 1px solid var(--rule-strong);
+}
+
+.grid-col-5 {
+  grid-column: span 5 / span 5;
+}
+
+.grid-col-6 {
+  grid-column: span 6 / span 6;
+}
+
+.grid-col-6:first-child {
+  border-right: 1px solid var(--rule-strong);
+}
+
+.grid-col-4 {
+  grid-column: span 4 / span 4;
+  border-right: 1px solid var(--rule-strong);
+}
+
+.grid-col-4:last-child {
+  border-right: none;
+}
+
+@media (max-width: 1080px) {
+  .ledger-trio {
+    grid-template-columns: 1fr;
+  }
+  .ledger-cell {
+    border-right: none;
+    border-bottom: 1px solid var(--rule);
+  }
+  .grid-col-7,
+  .grid-col-5,
+  .grid-col-6,
+  .grid-col-4 {
+    grid-column: span 12 / span 12;
+    border-right: none;
+    border-bottom: 1px solid var(--rule-strong);
+  }
+}
+
+@media (max-width: 640px) {
+  .folio-wrapper {
+    padding: 10px;
+  }
+}
+
+.section-pad {
+  padding: 24px;
+}
+
+.section-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.section-heading {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin: 0;
+  color: var(--ink);
+}
+
+/* Crisp Rectangular Ink Stamps (No Pill Glows) */
+.stamp {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border: 1px solid var(--rule-strong);
+  background-color: var(--paper);
+  color: var(--ink);
   white-space: nowrap;
 }
 
-.badge-pill--core {
-  background: rgba(34, 211, 238, 0.14);
-  border-color: rgba(34, 211, 238, 0.4);
-  color: var(--accent-cyan);
+.stamp--red {
+  border-color: var(--signal-red);
+  background-color: var(--signal-red-Tint);
+  color: var(--signal-red);
 }
 
-.badge-pill--warning {
-  background: rgba(245, 158, 11, 0.15);
-  border-color: rgba(245, 158, 11, 0.45);
-  color: var(--accent-amber);
+.stamp--amber {
+  border-color: var(--signal-amber);
+  background-color: var(--signal-amber-tint);
+  color: var(--signal-amber);
 }
 
-.badge-pill--danger {
-  background: rgba(244, 63, 94, 0.15);
-  border-color: rgba(244, 63, 94, 0.45);
-  color: var(--accent-coral);
+.stamp--green {
+  border-color: var(--signal-green);
+  background-color: var(--signal-green-tint);
+  color: var(--signal-green);
 }
 
-.badge-pill--success {
-  background: rgba(16, 185, 129, 0.15);
-  border-color: rgba(16, 185, 129, 0.45);
-  color: var(--accent-emerald);
+.stamp--muted {
+  border-color: var(--rule);
+  background-color: var(--paper-alt);
+  color: var(--ink-muted);
 }
 
 /* ============================================================================
-   CURRENT WEATHER & RAIN INTELLIGENCE NOWCASTING (MODULE 1)
+   TELEMETRY TABLES & 10-60 MINUTE BAROGRAPH CHART
    ============================================================================ */
 
-.live-weather-hero {
-  display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  gap: 18px;
-  align-items: center;
+.primary-reading-flex {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--rule);
 }
 
-@media (max-width: 720px) {
-  .live-weather-hero {
-    grid-template-columns: 1fr;
-  }
-}
-
-.temp-giant {
+.degree-giant {
   font-family: var(--font-display);
-  font-size: clamp(3rem, 5vw, 4.25rem);
+  font-size: clamp(3.25rem, 5vw, 4.5rem);
   font-weight: 700;
-  line-height: 0.95;
+  line-height: 0.9;
   letter-spacing: -0.04em;
   margin: 0;
-  color: var(--text-primary);
 }
 
-.metrics-grid-4 {
+.spec-strip {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-bottom: 1px solid var(--rule);
 }
 
-.metric-tile {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+.spec-cell {
   padding: 12px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  border-right: 1px solid var(--rule);
 }
 
-.metric-label {
+.spec-cell:last-child {
+  border-right: none;
+}
+
+.spec-key {
+  display: block;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--text-muted);
+  font-size: 0.7rem;
+  color: var(--ink-muted);
+  margin-bottom: 2px;
 }
 
-.metric-val {
+.spec-val {
   font-family: var(--font-display);
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
 
-/* 10-60 Minute Precipitation Chart */
-.nowcast-chart-box {
-  background: var(--bg-deep);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 16px;
-}
-
-.nowcast-bars {
+/* Barograph 10-60m Chart */
+.barograph-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 12px;
-  align-items: end;
+  border: 1px solid var(--rule);
+  background-color: var(--paper-alt);
+  margin-top: 12px;
+}
+
+.barograph-col {
+  padding: 12px 10px;
+  border-right: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.barograph-col:last-child {
+  border-right: none;
+}
+
+.barograph-well {
+  width: 100%;
+  height: 88px;
+  border-bottom: 1px solid var(--rule-strong);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 8px;
+}
+
+.barograph-bar {
+  width: 100%;
+  background-color: var(--ink);
+  transition: height 0.2s ease;
+}
+
+.barograph-bar--peak {
+  background-color: var(--signal-red);
+}
+
+/* Hourly Timetable Table */
+.timetable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
   margin-top: 14px;
 }
 
-.nowcast-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
+.timetable th,
+.timetable td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--rule);
 }
 
-.nowcast-well {
-  width: 100%;
-  height: 104px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 4px;
-  display: flex;
-  align-items: flex-end;
+.timetable th {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--ink-muted);
+  background-color: var(--paper-alt);
+  border-top: 1px solid var(--rule);
 }
 
-.nowcast-fill {
-  width: 100%;
-  border-radius: 5px;
-  background: linear-gradient(180deg, var(--accent-cyan) 0%, #0284c7 100%);
-  transition: height 0.25s var(--ease-out);
-}
-
-.nowcast-fill--heavy {
-  background: linear-gradient(180deg, var(--accent-amber) 0%, #d97706 100%);
-}
-
-/* Hourly Forecast Strip */
-.hourly-strip {
-  display: grid;
-  grid-template-columns: repeat(8, minmax(105px, 1fr));
-  gap: 10px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-}
-
-.hourly-slot {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 12px 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 6px;
-}
-
-.hourly-slot--rain {
-  border-color: rgba(34, 211, 238, 0.4);
-  background: rgba(21, 34, 60, 0.95);
-}
-
-/* Interactive Radar Map Canvas */
-.radar-map-stage {
-  position: relative;
-  height: 270px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-  background:
-    radial-gradient(circle at 38% 42%, rgba(245, 158, 11, 0.38) 0%, rgba(34, 211, 238, 0.28) 28%, transparent 60%),
-    radial-gradient(circle at 68% 65%, rgba(34, 211, 238, 0.3) 0%, transparent 48%),
-    #060c17;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+/* Topographic Contour Radar Map (Archival Cartography Style) */
+.cartography-box {
+  border: 1px solid var(--rule-strong);
+  background-color: var(--paper-alt);
   padding: 14px;
+  margin-top: 14px;
 }
 
-.radar-sweep-line {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent 48%, rgba(34, 211, 238, 0.14) 50%, transparent 52%);
-  animation: radarSweep 8s linear infinite;
-  pointer-events: none;
-}
-
-@keyframes radarSweep {
-  0% {
-    transform: translateX(-60%);
-  }
-  100% {
-    transform: translateX(60%);
-  }
-}
-
-/* ============================================================================
-   CLEAN LISTS & BUTTONS
-   ============================================================================ */
-
-.divided-list {
+/* Clean Ruled Rows */
+.ledger-list {
   display: flex;
   flex-direction: column;
 }
 
-.divided-row {
+.ledger-item {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
-  padding: 13px 0;
-  border-bottom: 1px solid var(--border-subtle);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--rule);
 }
 
-.divided-row:first-child {
-  padding-top: 2px;
+.ledger-item:first-child {
+  padding-top: 0;
 }
 
-.divided-row:last-child {
+.ledger-item:last-child {
   border-bottom: none;
   padding-bottom: 0;
 }
 
-.btn-action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: var(--accent-cyan);
-  color: var(--bg-deep);
-  border: none;
-  border-radius: var(--radius-md);
+/* Solid Ink Buttons (Zero Glow) */
+.btn-ink {
+  appearance: none;
+  background-color: var(--ink);
+  color: var(--paper);
+  border: 1px solid var(--ink);
+  border-radius: 4px;
   padding: 9px 16px;
   font-family: var(--font-body);
   font-size: 0.84rem;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.16s var(--ease-out);
+  transition: background-color 0.12s ease;
 }
 
-.btn-action:hover {
-  background: #ffffff;
-  transform: translateY(-1px);
+.btn-ink:hover {
+  background-color: var(--signal-red);
+  border-color: var(--signal-red);
 }
 
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: var(--bg-elevated);
-  color: var(--text-primary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 7px 13px;
+.btn-outline {
+  appearance: none;
+  background-color: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+  padding: 6px 12px;
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.16s var(--ease-out);
+  transition: background-color 0.12s ease, color 0.12s ease;
 }
 
-.btn-secondary:hover:not(:disabled) {
-  border-color: var(--accent-cyan);
-  background: var(--bg-interactive);
+.btn-outline:hover:not(:disabled) {
+  background-color: var(--ink);
+  color: var(--paper);
 }
 
-.btn-secondary:disabled {
-  opacity: 0.55;
+.btn-outline[aria-pressed="true"] {
+  background-color: var(--ink);
+  color: var(--paper);
+}
+
+.btn-outline:disabled {
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
-.input-field {
-  background: var(--bg-deep);
-  color: var(--text-primary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 9px 12px;
+.form-control {
+  background-color: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+  padding: 8px 10px;
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 0.84rem;
   width: 100%;
 }
