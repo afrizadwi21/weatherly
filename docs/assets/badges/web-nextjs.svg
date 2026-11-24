@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="224" height="28" role="img" aria-label="WEB: NEXT.JS 15 + TS">
+  <title>WEB: NEXT.JS 15 + TS</title>
+  <g shape-rendering="crispEdges">
+    <rect width="54" height="28" fill="#555"/>
+    <rect x="54" width="170" height="28" fill="#000000"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="100">
+    <text transform="scale(.1)" x="270" y="175" textLength="300" fill="#fff">WEB</text>
+    <text transform="scale(.1)" x="1390" y="175" font-weight="bold" fill="#fff" textLength="1460">NEXT.JS 15 + TS</text>
+  </g>
+</svg>

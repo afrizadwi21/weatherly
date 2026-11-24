@@ -5,12 +5,12 @@
 
 **A Full-Stack Weather Intelligence Platform for Hyperlocal Rain Nowcasting, Environmental Monitoring, Proactive Alerts, and AI-Driven Daily Decisions.**
 
-[![Go](https://img.shields.io/badge/Backend-Go_1.23_Gin-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://go.dev/)
-[![Next.js](https://img.shields.io/badge/Web-Next.js_15_TypeScript-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
-[![Flutter](https://img.shields.io/badge/Mobile-Flutter_3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev/)
-[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL_PostGIS-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://postgis.net/)
-[![Redis](https://img.shields.io/badge/Cache_Queue-Redis_Asynq-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
-[![Docker](https://img.shields.io/badge/Infra-Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Go](./docs/assets/badges/backend-go.svg)](https://go.dev/)
+[![Next.js](./docs/assets/badges/web-nextjs.svg)](https://nextjs.org/)
+[![Flutter](./docs/assets/badges/mobile-flutter.svg)](https://flutter.dev/)
+[![PostgreSQL](./docs/assets/badges/db-postgis.svg)](https://postgis.net/)
+[![Redis](./docs/assets/badges/cache-redis.svg)](https://redis.io/)
+[![Docker](./docs/assets/badges/infra-docker.svg)](https://www.docker.com/)
 
 [Visi & Latar Belakang](#-kenapa-weatherly-dibuat-why-weatherly) •
 [Arsitektur Sistem (Go)](#-arsitektur-sistem-system-architecture) •

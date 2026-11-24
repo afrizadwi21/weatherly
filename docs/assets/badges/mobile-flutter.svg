@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="186" height="28" role="img" aria-label="MOBILE: FLUTTER 3.X">
+  <title>MOBILE: FLUTTER 3.X</title>
+  <g shape-rendering="crispEdges">
+    <rect width="70" height="28" fill="#555"/>
+    <rect x="70" width="116" height="28" fill="#02569b"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="100">
+    <text transform="scale(.1)" x="350" y="175" textLength="460" fill="#fff">MOBILE</text>
+    <text transform="scale(.1)" x="1280" y="175" font-weight="bold" fill="#fff" textLength="920">FLUTTER 3.X</text>
+  </g>
+</svg>

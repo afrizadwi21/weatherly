@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="246" height="28" role="img" aria-label="DATABASE: POSTGRES + POSTGIS">
+  <title>DATABASE: POSTGRES + POSTGIS</title>
+  <g shape-rendering="crispEdges">
+    <rect width="84" height="28" fill="#555"/>
+    <rect x="84" width="162" height="28" fill="#336791"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="100">
+    <text transform="scale(.1)" x="420" y="175" textLength="600" fill="#fff">DATABASE</text>
+    <text transform="scale(.1)" x="1650" y="175" font-weight="bold" fill="#fff" textLength="1380">POSTGRES + POSTGIS</text>
+  </g>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="204" height="28" role="img" aria-label="INFRA: DOCKER COMPOSE">
+  <title>INFRA: DOCKER COMPOSE</title>
+  <g shape-rendering="crispEdges">
+    <rect width="62" height="28" fill="#555"/>
+    <rect x="62" width="142" height="28" fill="#2496ed"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="100">
+    <text transform="scale(.1)" x="310" y="175" textLength="380" fill="#fff">INFRA</text>
+    <text transform="scale(.1)" x="1330" y="175" font-weight="bold" fill="#fff" textLength="1180">DOCKER COMPOSE</text>
+  </g>
+</svg>

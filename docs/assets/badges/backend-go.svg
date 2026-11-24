@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="210" height="28" role="img" aria-label="BACKEND: GO 1.23 (GIN)">
+  <title>BACKEND: GO 1.23 (GIN)</title>
+  <g shape-rendering="crispEdges">
+    <rect width="78" height="28" fill="#555"/>
+    <rect x="78" width="132" height="28" fill="#00add8"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="100">
+    <text transform="scale(.1)" x="390" y="175" textLength="540" fill="#fff">BACKEND</text>
+    <text transform="scale(.1)" x="1440" y="175" font-weight="bold" fill="#fff" textLength="1080">GO 1.23 (GIN)</text>
+  </g>
+</svg>

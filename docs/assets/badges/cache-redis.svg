@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="206" height="28" role="img" aria-label="QUEUE: REDIS + ASYNQ">
+  <title>QUEUE: REDIS + ASYNQ</title>
+  <g shape-rendering="crispEdges">
+    <rect width="68" height="28" fill="#555"/>
+    <rect x="68" width="138" height="28" fill="#dc382d"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="100">
+    <text transform="scale(.1)" x="340" y="175" textLength="440" fill="#fff">QUEUE</text>
+    <text transform="scale(.1)" x="1370" y="175" font-weight="bold" fill="#fff" textLength="1140">REDIS + ASYNQ</text>
+  </g>
+</svg>
