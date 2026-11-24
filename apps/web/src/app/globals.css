@@ -1,0 +1,518 @@
+/* ============================================================================
+   WEATHERLY DESIGN SYSTEM — GLOBAL TOKENS & OBSERVATORY STYLES
+   Syncs 1:1 with DESIGN.md and .impeccable/design.json
+   ============================================================================ */
+
+:root {
+  /* Color Tokens */
+  --color-troposphere-night: #090f1d;
+  --color-stratosphere-slate: #111a2e;
+  --color-cumulus-surface: #17233d;
+  --color-isobar-border: #263859;
+  --color-cirrus-alabaster: #f3f6fc;
+  --color-mist-secondary: #a5b8d9;
+  --color-barometer-muted: #6e84ab;
+  --color-radar-cyan: #14b8d4;
+  --color-radar-cyan-deep: #0d8ca3;
+  --color-monsoon-amber: #f59e0b;
+  --color-tempest-crimson: #ef4444;
+  --color-canopy-emerald: #10b981;
+
+  /* Typography Tokens */
+  --font-display: var(--font-space-grotesk), "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-body: var(--font-jakarta), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+
+  /* Radius & Spacing Tokens */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 9999px;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+
+  /* Motion & Elevation */
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --shadow-instrument-lift: 0 10px 28px -6px rgba(4, 9, 20, 0.65);
+  --shadow-focus-halo: 0 0 0 2px #090f1d, 0 0 0 4px #14b8d4;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background-color: var(--color-troposphere-night);
+  color: var(--color-cirrus-alabaster);
+  font-family: var(--font-body);
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--color-troposphere-night);
+  color: var(--color-cirrus-alabaster);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  overflow-x: hidden;
+  caret-color: var(--color-radar-cyan);
+}
+
+/* Browser Surface Craft Floor: Selection, Scrollbars, Focus Rings, Tabular Numerals */
+::selection {
+  background-color: var(--color-radar-cyan);
+  color: var(--color-troposphere-night);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-troposphere-night);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-isobar-border);
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--color-troposphere-night);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-barometer-muted);
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus-halo);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================================
+   ATMOSPHERIC SKY STAGE & PARALLAX DRIFTING CLOUDS BEHIND "WEATHERLY"
+   ============================================================================ */
+
+.observatory-shell {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-lg) var(--space-2xl);
+}
+
+.sky-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-isobar-border);
+  background: radial-gradient(
+    ellipse 90% 80% at 50% 15%,
+    #192b4d 0%,
+    var(--color-stratosphere-slate) 58%,
+    var(--color-troposphere-night) 100%
+  );
+  padding: var(--space-xl) var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.cloud-stage {
+  position: relative;
+  min-height: 170px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  isolation: isolate;
+}
+
+.cloud-band {
+  position: absolute;
+  left: -15%;
+  width: 130%;
+  pointer-events: none;
+  user-select: none;
+  will-change: transform;
+}
+
+.cloud-band--back {
+  top: 6px;
+  z-index: 1;
+  opacity: 0.42;
+  animation: cloudDriftRight 56s linear infinite alternate;
+}
+
+.cloud-band--mid {
+  top: 28px;
+  z-index: 2;
+  opacity: 0.58;
+  animation: cloudDriftLeft 42s linear infinite alternate;
+}
+
+.cloud-band--front {
+  bottom: 18px;
+  z-index: 4;
+  opacity: 0.36;
+  animation: cloudDriftRight 34s linear infinite alternate;
+}
+
+@keyframes cloudDriftRight {
+  0% {
+    transform: translate3d(-4%, 0, 0);
+  }
+  100% {
+    transform: translate3d(4%, 0, 0);
+  }
+}
+
+@keyframes cloudDriftLeft {
+  0% {
+    transform: translate3d(4%, 0, 0);
+  }
+  100% {
+    transform: translate3d(-4%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cloud-band--back,
+  .cloud-band--mid,
+  .cloud-band--front {
+    animation: none;
+  }
+}
+
+.masthead-wordmark {
+  position: relative;
+  z-index: 3;
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6vw, 4.25rem);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--color-cirrus-alabaster);
+  margin: 0 0 var(--space-xs);
+  text-shadow: 0 8px 24px rgba(9, 15, 29, 0.78);
+}
+
+.masthead-tagline {
+  position: relative;
+  z-index: 5;
+  color: var(--color-mist-secondary);
+  font-size: 1rem;
+  max-width: 64ch;
+  margin: 0 auto var(--space-lg);
+}
+
+.hero-toolbar {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-isobar-border);
+}
+
+.location-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.loc-pill {
+  background: var(--color-cumulus-surface);
+  color: var(--color-mist-secondary);
+  border: 1px solid var(--color-isobar-border);
+  border-radius: var(--radius-pill);
+  padding: 8px 16px;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.16s var(--ease-out-expo), color 0.16s var(--ease-out-expo), border-color 0.16s var(--ease-out-expo);
+}
+
+.loc-pill:hover {
+  color: var(--color-cirrus-alabaster);
+  border-color: var(--color-radar-cyan);
+}
+
+.loc-pill[aria-pressed="true"] {
+  background: var(--color-radar-cyan);
+  color: var(--color-troposphere-night);
+  border-color: var(--color-radar-cyan);
+}
+
+/* ============================================================================
+   INSTRUMENT PANELS, GRIDS & TELEMETRY ROWS
+   ============================================================================ */
+
+.alert-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  background: #1d1623;
+  border: 1px solid var(--color-monsoon-amber);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.ops-grid-primary {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.col-span-7 {
+  grid-column: span 7 / span 7;
+}
+
+.col-span-5 {
+  grid-column: span 5 / span 5;
+}
+
+.col-span-4 {
+  grid-column: span 4 / span 4;
+}
+
+.col-span-12 {
+  grid-column: span 12 / span 12;
+}
+
+@media (max-width: 1024px) {
+  .col-span-7,
+  .col-span-5,
+  .col-span-4 {
+    grid-column: span 12 / span 12;
+  }
+}
+
+@media (max-width: 640px) {
+  .observatory-shell {
+    padding: var(--space-md);
+  }
+  .sky-hero {
+    padding: var(--space-lg) var(--space-md);
+  }
+}
+
+.instrument-panel {
+  background: var(--color-stratosphere-slate);
+  border: 1px solid var(--color-isobar-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-isobar-border);
+}
+
+.panel-title {
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-cirrus-alabaster);
+  margin: 0;
+}
+
+.meta-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--color-cumulus-surface);
+  color: var(--color-radar-cyan);
+  border: 1px solid var(--color-isobar-border);
+  white-space: nowrap;
+}
+
+.meta-tag--amber {
+  color: var(--color-monsoon-amber);
+}
+
+.meta-tag--emerald {
+  color: var(--color-canopy-emerald);
+}
+
+.meta-tag--muted {
+  color: var(--color-barometer-muted);
+}
+
+/* Primary Weather & Rain Nowcast Readout */
+.weather-summary-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-lg);
+}
+
+.temp-display {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  margin: 0;
+}
+
+.telemetry-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: var(--space-sm);
+  padding: var(--space-md) 0;
+  border-top: 1px solid var(--color-isobar-border);
+  border-bottom: 1px solid var(--color-isobar-border);
+}
+
+.telemetry-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.telemetry-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-barometer-muted);
+}
+
+.telemetry-value {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-cirrus-alabaster);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 10-60 Minute Nowcasting Curve Bars */
+.rain-curve-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--space-sm);
+  align-items: end;
+  padding-top: var(--space-sm);
+}
+
+.rain-bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.rain-bar-track {
+  width: 100%;
+  height: 92px;
+  background: var(--color-troposphere-night);
+  border: 1px solid var(--color-isobar-border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: flex-end;
+  padding: 3px;
+}
+
+.rain-bar-fill {
+  width: 100%;
+  background: var(--color-radar-cyan);
+  border-radius: 3px;
+  transition: height 0.25s var(--ease-out-expo);
+}
+
+.rain-bar-fill--peak {
+  background: var(--color-monsoon-amber);
+}
+
+/* Flat Divided Rows (Avoids Card-in-Card Nesting) */
+.row-list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--color-isobar-border);
+}
+
+.row-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-isobar-border);
+}
+
+.row-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* Buttons */
+.btn-primary {
+  background: var(--color-radar-cyan);
+  color: var(--color-troposphere-night);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 10px 18px;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.16s var(--ease-out-expo), transform 0.16s var(--ease-out-expo);
+}
+
+.btn-primary:hover {
+  background: var(--color-cirrus-alabaster);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  background: var(--color-cumulus-surface);
+  color: var(--color-cirrus-alabaster);
+  border: 1px solid var(--color-isobar-border);
+  border-radius: var(--radius-md);
+  padding: 6px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  transition: border-color 0.16s ease, background 0.16s ease;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  border-color: var(--color-radar-cyan);
+  background: #1c2b4a;
+}
+
+.btn-ghost:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

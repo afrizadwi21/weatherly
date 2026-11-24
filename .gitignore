@@ -10,6 +10,13 @@
 *.key
 service-account*.json
 firebase-adminsdk*.json
+.agent/
+.agents/
+.impeccable/
+DESIGN.md
+PRODUCT.md
+AGENTS.md
+apps/web/AGENTS.md
 
 # 2. Golang Backend (backend/)
 backend/bin/
