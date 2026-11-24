@@ -109,4 +109,25 @@ func TestWeatherAndRainEndpoints(t *testing.T) {
 			t.Errorf("expected alert deduplication guard to block duplicate emission (first=%v, second=%v)", firstCreated, secondCreated)
 		}
 	})
+
+	t.Run("GET /api/v1/flood/nearby and GET /api/v1/insights/daily", func(t *testing.T) {
+		floodReq := httptest.NewRequest(http.MethodGet, "/api/v1/flood/nearby", nil)
+		floodRec := httptest.NewRecorder()
+		mux.ServeHTTP(floodRec, floodReq)
+		if floodRec.Code != http.StatusOK {
+			t.Fatalf("expected 200 OK on flood nearby, got %d", floodRec.Code)
+		}
+
+		aiReq := httptest.NewRequest(http.MethodGet, "/api/v1/insights/daily", nil)
+		aiRec := httptest.NewRecorder()
+		mux.ServeHTTP(aiRec, aiReq)
+		if aiRec.Code != http.StatusOK {
+			t.Fatalf("expected 200 OK on daily insights, got %d", aiRec.Code)
+		}
+		var insights domain.DailyInsightsResponse
+		_ = json.NewDecoder(aiRec.Body).Decode(&insights)
+		if insights.Location != "Bandung" || len(insights.Insights) < 2 {
+			t.Errorf("unexpected daily insights response: %+v", insights)
+		}
+	})
 }

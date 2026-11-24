@@ -27,12 +27,14 @@ func NewMux(cfg *config.Config) *http.ServeMux {
 	weatherSvc := service.NewWeatherService(weatherClient)
 	envSvc := service.NewEnvironmentService()
 	alertSvc := service.NewAlertService()
+	intelSvc := service.NewIntelligenceService(weatherSvc, envSvc)
 
 	authHandler := NewAuthHandler(cfg, store)
 	locHandler := NewLocationHandler(cfg, store)
 	weatherHandler := NewWeatherHandler(cfg, store, weatherSvc)
 	envHandler := NewEnvironmentHandler(weatherHandler, envSvc)
 	alertHandler := NewAlertHandler(cfg, alertSvc)
+	intelHandler := NewIntelligenceHandler(weatherHandler, intelSvc)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/health", HealthHandler(cfg))
@@ -59,6 +61,11 @@ func NewMux(cfg *config.Config) *http.ServeMux {
 	mux.HandleFunc("GET /api/v1/alerts/{id}", alertHandler.GetAlert)
 	mux.HandleFunc("POST /api/v1/devices/register", alertHandler.RegisterDevice)
 	mux.HandleFunc("GET /api/v1/notifications", alertHandler.ListNotifications)
+
+	mux.HandleFunc("GET /api/v1/flood/nearby", intelHandler.FloodNearby)
+	mux.HandleFunc("POST /api/v1/flood/reports", intelHandler.CreateFloodReport)
+	mux.HandleFunc("GET /api/v1/insights/daily", intelHandler.DailyInsights)
+	mux.HandleFunc("POST /api/v1/insights/generate", intelHandler.GenerateInsights)
 	return mux
 }
 
