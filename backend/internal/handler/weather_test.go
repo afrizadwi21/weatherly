@@ -8,6 +8,7 @@ import (
 
 	"github.com/afrizadwi21/weatherly/backend/internal/config"
 	"github.com/afrizadwi21/weatherly/backend/internal/domain"
+	"github.com/afrizadwi21/weatherly/backend/internal/service"
 )
 
 func TestWeatherAndRainEndpoints(t *testing.T) {
@@ -89,6 +90,23 @@ func TestWeatherAndRainEndpoints(t *testing.T) {
 		_ = json.NewDecoder(rec.Body).Decode(&uv)
 		if uv.UVIndex <= 0 || uv.UVCategory == "" {
 			t.Errorf("unexpected UV observation: %+v", uv)
+		}
+	})
+
+	t.Run("GET /api/v1/alerts and deduplicated FCM push notifications", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/api/v1/alerts", nil)
+		rec := httptest.NewRecorder()
+		mux.ServeHTTP(rec, req)
+		if rec.Code != http.StatusOK {
+			t.Fatalf("expected 200 OK on alerts list, got %d", rec.Code)
+		}
+
+		alertSvc := service.NewAlertService()
+		loc := domain.Location{ID: "loc-bandung-default", Name: "Bandung"}
+		_, firstCreated := alertSvc.EvaluateAndCreateAlert(loc, "HEAVY_RAIN", "high", "Hujan Lebat", "Waspada", "2026-11-24-14")
+		_, secondCreated := alertSvc.EvaluateAndCreateAlert(loc, "HEAVY_RAIN", "high", "Hujan Lebat", "Waspada", "2026-11-24-14")
+		if !firstCreated || secondCreated {
+			t.Errorf("expected alert deduplication guard to block duplicate emission (first=%v, second=%v)", firstCreated, secondCreated)
 		}
 	})
 }

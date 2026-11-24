@@ -26,11 +26,13 @@ func NewMux(cfg *config.Config) *http.ServeMux {
 	weatherClient := provider.NewWeatherClient(cfg.OpenMeteoBaseURL)
 	weatherSvc := service.NewWeatherService(weatherClient)
 	envSvc := service.NewEnvironmentService()
+	alertSvc := service.NewAlertService()
 
 	authHandler := NewAuthHandler(cfg, store)
 	locHandler := NewLocationHandler(cfg, store)
 	weatherHandler := NewWeatherHandler(cfg, store, weatherSvc)
 	envHandler := NewEnvironmentHandler(weatherHandler, envSvc)
+	alertHandler := NewAlertHandler(cfg, alertSvc)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/health", HealthHandler(cfg))
@@ -52,6 +54,11 @@ func NewMux(cfg *config.Config) *http.ServeMux {
 	mux.HandleFunc("GET /api/v1/air-quality/history", envHandler.AirQualityHistory)
 	mux.HandleFunc("GET /api/v1/uv/current", envHandler.UVCurrent)
 	mux.HandleFunc("GET /api/v1/uv/forecast", envHandler.UVForecast)
+
+	mux.HandleFunc("GET /api/v1/alerts", alertHandler.ListAlerts)
+	mux.HandleFunc("GET /api/v1/alerts/{id}", alertHandler.GetAlert)
+	mux.HandleFunc("POST /api/v1/devices/register", alertHandler.RegisterDevice)
+	mux.HandleFunc("GET /api/v1/notifications", alertHandler.ListNotifications)
 	return mux
 }
 
