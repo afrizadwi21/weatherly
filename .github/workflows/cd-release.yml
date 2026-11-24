@@ -14,7 +14,7 @@ env:
 
 jobs:
   docker-build-validate:
-    name: Build & Validate Production Containers
+    name: Build & Validate Production Containers (Go Backend & Next.js Web)
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -33,7 +33,7 @@ jobs:
           cp .env.example .env || true
           docker compose config -q
 
-      - name: Build Backend Docker Image
+      - name: Build Golang Backend Docker Image
         if: hashFiles('backend/Dockerfile') != ''
         uses: docker/build-push-action@v5
         with:
@@ -41,5 +41,16 @@ jobs:
           file: ./backend/Dockerfile
           push: false
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/backend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build Next.js Web Docker Image
+        if: hashFiles('apps/web/Dockerfile') != ''
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/web
+          file: ./apps/web/Dockerfile
+          push: false
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/web:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

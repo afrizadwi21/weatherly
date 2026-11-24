@@ -5,17 +5,18 @@
 
 **A Full-Stack Weather Intelligence Platform for Hyperlocal Rain Nowcasting, Environmental Monitoring, Proactive Alerts, and AI-Driven Daily Decisions.**
 
-[![Go](https://img.shields.io/badge/Backend-Go_1.23_%28Gin_%2B_pgx%29-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://go.dev/)
-[![Next.js](https://img.shields.io/badge/Web-Next.js_15_%2B_TypeScript-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Go](https://img.shields.io/badge/Backend-Go_1.23_Gin-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://go.dev/)
+[![Next.js](https://img.shields.io/badge/Web-Next.js_15_TypeScript-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![Flutter](https://img.shields.io/badge/Mobile-Flutter_3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev/)
-[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL_%2B_PostGIS-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://postgis.net/)
-[![Redis](https://img.shields.io/badge/Cache_%26_Queue-Redis_%2B_Asynq-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
+[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL_PostGIS-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://postgis.net/)
+[![Redis](https://img.shields.io/badge/Cache_Queue-Redis_Asynq-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![Docker](https://img.shields.io/badge/Infra-Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
 [Visi & Latar Belakang](#-kenapa-weatherly-dibuat-why-weatherly) •
 [Arsitektur Sistem (Go)](#-arsitektur-sistem-system-architecture) •
 [8 Modul Utama](#-8-modul-fitur-utama-feature-architecture) •
-[Database & ERD](#-desain-database--erd-postgis) •
+[Desain UI & Dashboard](#-product-design--ui-preview) •
+[Database & ERD](#-desain-database--erd-postgresql--postgis) •
 [API Contract](#-api-contract--endpoints-apiv1) •
 [Workflow & CI/CD](#-development-workflow--cicd) •
 [Roadmap](#-12-week-engineering-roadmap)
@@ -149,6 +150,49 @@ Weatherly dibangun di atas 8 modul domain yang saling terintegrasi, dibagi ke da
 - [ ] **UV & Air Quality**: Integrasi metrik AQI, PM2.5, PM10, dan UV Index.
 - [ ] **Cross-Platform Dashboard**: Aplikasi mobile Flutter dan dashboard web Next.js yang responsif.
 - [ ] **Weather History**: Penyimpanan dan visualisasi riwayat observasi vs. akurasi prediksi.
+
+---
+
+## 🎨 Product Design & UI Preview
+
+Struktur antarmuka Weatherly dirancang sebagai **SaaS-style Weather Intelligence Dashboard** untuk Mobile (Flutter) dan Web (Next.js):
+- **Header & Location Switcher**: Lokasi aktif, koordinat GPS, dan timestamp pembaruan terakhir.
+- **Current Weather & Rain Alert Banner**: Suhu aktual, kelembapan, kecepatan angin, serta *countdown* estimasi kedatangan hujan berikutnya.
+- **Hourly Forecast & Weather Radar Map**: Grafik presipitasi per jam dan peta interaktif radar hujan.
+- **Environmental Indicators & AI Daily Insights**: Kartu indikator AQI (PM2.5/PM10), UV Index, peringatan aktif (*Active Alerts*), dan rekomendasi aktivitas harian berbasis AI.
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="33%">
+        <img src="https://images.openai.com/static-rsc-4/VSJpQLrAf6EzvUGQVFTI_lhFnvrh6pFTWj7_EWHIh0JB6UBIGkrftZJO_XgAEq6NMh8iAVEaYFSlTOhRrtCC-mhETUSdUkHGb4Mm1Yum4lKwP_OckQYVhqJtBajVWivGw5gRSlrr5HXm5C3kfyxvV2AAWwUWtkeP0gu_gtahKFs?purpose=inline" alt="Mobile Weather UI Concept" width="100%" />
+        <br /><sub><b>Mobile UI Concept</b> — Hyperlocal Rain & Nowcasting</sub>
+      </td>
+      <td align="center" width="33%">
+        <img src="https://images.openai.com/static-rsc-4/3L7ZCjBUVzw_WiAARUWQRPGKDkQEVIJI-dKIwNLRpbjGGx7iJAJE4qSBkr_WzoDsL59T78DxkCTFKHplBaBG9QcWVxt8I_vNWLvi3rcMVriTmxheFSH0QFoY3kS1q3rE2XS-b5odO9gAPVBRjK3eUvVdcejVGs7971YuSdb1Xxw?purpose=inline" alt="Weather Radar Map Concept" width="100%" />
+        <br /><sub><b>Weather Radar App</b> — Live Precipitation & Storm Tracking</sub>
+      </td>
+      <td align="center" width="33%">
+        <img src="https://images.openai.com/static-rsc-4/sSpv6cHBxLBhASjAGV_KvOuA-qHziIXQUilSD5GrS_S4MxuCLrMSfY5Rum0UZ7Yi4tVMht2j7pbyIVUaqpEDvsajurasqis915tEAKRktV97uMmW42yImwfuP5oRNLQNDyNacIksGRefM2FzXyLslc4TLmWKDdGnFpwQ3KgbJWA?purpose=inline" alt="SaaS Weather Intelligence Dashboard" width="100%" />
+        <br /><sub><b>Web Intelligence Dashboard</b> — Multi-Metric SaaS View</sub>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" width="33%">
+        <img src="https://images.openai.com/static-rsc-4/J8nIEOk-pbRKqyxpnU9c-ftTLd2iRwuAf_wLLpxa2VkG6POyGK0R8hXC8OzW3WSbV8D7WbGr2-GWoX0Dga5tEr9CB3J2Fpg9cLGj4q0Lic3SpOxKF4JjywIiGMAldNrwq8lioxLfTeOTDxIFpBale36KepuJiFss8TUVCL6dfAA?purpose=inline" alt="Weather Dashboard Concept" width="100%" />
+        <br /><sub><b>Analytics & Forecast View</b> — Hourly Curve & UV/Wind</sub>
+      </td>
+      <td align="center" width="33%">
+        <img src="https://images.openai.com/static-rsc-4/xBcDXa7XIc07AuHmSgGLXBf6MOeh-2yyT_x_CZOVfc-NQ7PtJEG_5B5nPIGAp5ROjPvz0WjoFGwaZQLQ9iZVbfaJeGQ9cl7SoPnzyFkKtLzyWQNixte1qKbFxrfDhTb4S0pZRwnUkvDPTFmtftDnftSQFuyMh2YQiJwmNgvrZOg?purpose=inline" alt="Live Weather and AQI Dashboard" width="100%" />
+        <br /><sub><b>Environmental & AQI</b> — PM2.5, PM10 & Air Quality Index</sub>
+      </td>
+      <td align="center" width="33%">
+        <img src="https://images.openai.com/static-rsc-4/nqMTXVNuNFZZp2r4Ti5EZnLDyV4EfIHt8BgAlCXL2YBZdlV-Ljg3mVhOq3poVTCFjJucxi5lexot_nFEOV5OBNMqzwMBLOawyWj1VXxhkFW-YNQ7QoaM4oMFVLDQMbsnw5tFDzb4miJdgideLZhysiHCmOQ_rl_N3MpVtypvU1M?purpose=inline" alt="Freemium SaaS Model" width="100%" />
+        <br /><sub><b>Freemium Consumer SaaS</b> — Tiered Intelligence Features</sub>
+      </td>
+    </tr>
+  </table>
+</div>
 
 ---
 
@@ -294,6 +338,21 @@ erDiagram
         float rain_probability
         timestamp estimated_at
         timestamp created_at
+    }
+    NOTIFICATION_DEVICES {
+        uuid id PK
+        uuid user_id FK
+        varchar fcm_token UK
+        varchar platform
+        boolean is_active
+        timestamp registered_at
+    }
+    NOTIFICATION_LOGS {
+        uuid id PK
+        uuid alert_id FK
+        uuid device_id FK
+        varchar status
+        timestamp sent_at
     }
     AI_INSIGHTS {
         uuid id PK
@@ -473,7 +532,7 @@ cp .env.example .env
 docker compose up --build -d
 
 # 4. Jalankan migrasi database SQL (golang-migrate)
-docker compose exec backend ./weatherly-migrate up
+docker compose run --rm migrate up
 ```
 
 Layanan akan tersedia pada:
