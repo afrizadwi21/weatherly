@@ -540,7 +540,6 @@ export default function LandingPage() {
               </span>
               <p className="probe__advice">{data.whatToPrepare}</p>
               <span className="probe__source">
-                <span className={`dot ${live ? "dot--live" : ""}`} aria-hidden="true" />
                 {live
                   ? `Real-Time BMKG (${selectedKec ? selectedKec.adm3 : loc.adm2}) + Open-Meteo`
                   : "Memuat telemetri BMKG Jawa Barat..."}
