@@ -93,7 +93,7 @@ func TestWeatherAndRainEndpoints(t *testing.T) {
 		}
 	})
 
-	t.Run("GET /api/v1/alerts and deduplicated FCM push notifications", func(t *testing.T) {
+	t.Run("GET /api/v1/alerts and deduplicated web alerts", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/api/v1/alerts", nil)
 		rec := httptest.NewRecorder()
 		mux.ServeHTTP(rec, req)

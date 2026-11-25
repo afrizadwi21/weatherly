@@ -39,6 +39,7 @@ go.work.sum
 # 3. Next.js Web App (apps/web/)
 node_modules/
 apps/web/.next/
+apps/web/data/
 apps/web/out/
 apps/web/build/
 apps/web/coverage/

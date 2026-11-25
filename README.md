@@ -1,213 +1,121 @@
 <div align="center">
 
-# 🌦️ WEATHERLY
+# WEATHERLY
 ### **Know the Weather. Prepare Before It Happens.**
 
-**A Full-Stack Weather Intelligence Platform for Hyperlocal Rain Nowcasting, Environmental Monitoring, Proactive Alerts, and AI-Driven Daily Decisions.**
+**Platform Intelijen Cuaca Web untuk Seluruh 27 Kota/Kabupaten & 627 Kecamatan di Jawa Barat (BMKG Kode 32), Berita Acara Cuaca & Bencana, Pemantauan Udara & UV Real-Time, Asisten Cuaca AI, Rute Perjalanan Smart Travel, serta Laporan Warga Berfoto.**
 
 [![Go](./docs/assets/badges/backend-go.svg)](https://go.dev/)
 [![Next.js](./docs/assets/badges/web-nextjs.svg)](https://nextjs.org/)
-[![Flutter](./docs/assets/badges/mobile-flutter.svg)](https://flutter.dev/)
 [![PostgreSQL](./docs/assets/badges/db-postgis.svg)](https://postgis.net/)
 [![Redis](./docs/assets/badges/cache-redis.svg)](https://redis.io/)
 [![Docker](./docs/assets/badges/infra-docker.svg)](https://www.docker.com/)
 
 [Visi & Latar Belakang](#-kenapa-weatherly-dibuat-why-weatherly) •
-[Arsitektur Sistem (Go)](#-arsitektur-sistem-system-architecture) •
-[8 Modul Utama](#-8-modul-fitur-utama-feature-architecture) •
-[Desain UI & Dashboard](#-product-design--ui-preview) •
-[Database & ERD](#-desain-database--erd-postgresql--postgis) •
-[API Contract](#-api-contract--endpoints-apiv1) •
-[Workflow & CI/CD](#-development-workflow--cicd) •
-[Roadmap](#-12-week-engineering-roadmap)
+[Arsitektur Sistem](#-arsitektur-sistem-system-architecture) •
+[Modul Fitur Utama](#-modul-fitur-utama-feature-architecture) •
+[Mode Akses (Guest & Akun Personal)](#-mode-akses-tanpa-login-vs-akun-personal) •
+[Desain Database & ERD](#-desain-database--erd) •
+[API Contract](#-api-contract--endpoints) •
+[Workflow & CI/CD](#-development-workflow--cicd)
 
 </div>
 
 ---
 
-## 💡 Kenapa Weatherly Dibuat? (*Why Weatherly?*)
+## Kenapa Weatherly Dibuat? (*Why Weatherly?*)
 
-Aplikasi cuaca konvensional umumnya hanya bersifat **pasif dan deskriptif** — mereka sekadar menjawab pertanyaan:
-> *"Bagaimana cuaca hari ini? Berapa derajat suhu sekarang?"*
+Di wilayah tropis dengan dinamika mikro-klimatologi yang cepat seperti **Provinsi Jawa Barat (27 Kota & Kabupaten, 627 Kecamatan)**, perubahan cuaca terjadi secara mendadak — mulai dari hujan deras lokal, petir, angin kencang, perubahan indeks UV dan kualitas udara (`AQI` / `PM2.5` / `SO2`), hingga banjir dan longsor di jalur komuter.
 
-Di wilayah tropis dengan dinamika mikro-klimatologi yang cepat seperti **Indonesia (khususnya Bandung dan sekitarnya)**, perubahan cuaca terjadi secara mendadak. Hujan deras lokal, petir, angin kencang, lonjakan indeks UV di siang hari, perubahan kualitas udara (AQI/PM2.5), hingga genangan banjir di titik komuter sering kali mengejutkan pengendara motor/mobil, pekerja lapangan, pelajar, dan masyarakat umum.
+**Weatherly** dibangun sebagai **Web Weather Intelligence Platform** yang menggabungkan prakiraan harian resmi **BMKG Provinsi Jawa Barat (Kode 32)**, telemetri cuaca & polutan udara real-time **Open-Meteo**, agregasi **Berita Acara Cuaca & Bencana Jawa Barat** beserta tautan sumber resmi, serta fitur personalisasi berbasis akun web.
 
-**Weatherly** dibangun sebagai **Weather Intelligence Platform** yang mengubah paradigma dari *sekadar melihat angka cuaca* menjadi **sistem pendukung keputusan proaktif (*proactive decision-making*)** yang menjawab tiga pertanyaan krusial:
-1. **Apa** perubahan cuaca dan risiko lingkungan yang kemungkinan besar terjadi di titik koordinat saya?
-2. **Kapan** tepatnya perubahan tersebut tiba (estimasi *lead-time* 10–60 menit ke depan)?
-3. **Apa** langkah persiapan atau penyesuaian aktivitas/perjalanan terbaik yang harus saya lakukan sekarang?
-
-### 🎯 Tiga Pilar Utama Weatherly
-| Pilar | Pendekatan Konvensional | Pendekatan Weatherly Intelligence |
+### Tiga Pilar Utama Weatherly
+| Pilar | Pendekatan Konvensional | Pendekatan Weatherly Web Platform |
 | :--- | :--- | :--- |
-| **1. Prediction Accuracy** | Hanya menampilkan persentase peluang hujan harian tanpa konteks waktu kedatangan. | Menggabungkan multi-provider (*BMKG, OpenWeather One Call, Radar*) secara paralel dengan *Go goroutines* & evaluasi historis (*false alarm, missed rain event, arrival time accuracy*). |
-| **2. Intelligent Recommendation** | Grafik mentah yang harus diinterpretasikan sendiri oleh pengguna. | **Two-Stage AI Pipeline**: Rule Engine memvalidasi threshold cuaca/UV/AQI dengan *strict Go type-safety*, lalu LLM merangkum rekomendasi aktivitas yang terverifikasi & bebas halusinasi. |
-| **3. Proactive Notification** | Pengguna harus membuka aplikasi untuk mengecek cuaca. | **Asynq (Go Redis Worker) & FCM** mengirimkan peringatan *sebelum* hujan turun atau cuaca ekstrem melanda lokasi pengguna dengan *deduplication guard*. |
+| **1. Cakupan Lengkap Jawa Barat (BMKG 32)** | Hanya menampilkan cuaca kota besar tanpa rincian kecamatan. | Mencakup seluruh **27 Kota & Kabupaten (`32.01`–`32.79`)** dan **627 Kecamatan (`32.xx.xx`)** di Jawa Barat dengan pencarian instan dan jadwal *Master–Detail* yang bersih. |
+| **2. Asisten Cuaca AI Tervalidasi** | AI menjawab bebas atau mengarang angka cuaca. | **Two-Stage AI Weather Engine**: Guardrail topik menolak pertanyaan di luar cuaca, menjelaskan **kondisi cuaca aktual saat ini** terlebih dahulu, lalu menyampaikan **prediksi harian BMKG (`Hari Ini` & `Besok`)** beserta rekomendasi aktivitas. |
+| **3. Peringatan Lokasi Tersimpan & Data Valid (Zero Dummy)** | Dipenuhi data contoh/dummy dan memaksa instalasi aplikasi mobile. | **100% berbasis Web**: Peringatan cuaca real-time di dasbor web khusus untuk lokasi yang disimpan pengguna, rute **Smart Travel** yang dibuat sendiri oleh pengguna, serta **Laporan Warga** yang wajib menyertakan foto bukti lapangan dan tanggal laporan lengkap. |
 
 ---
 
-## 🏗️ Arsitektur Sistem (*System Architecture*)
+## Arsitektur Sistem (*System Architecture*)
 
-Weatherly menggunakan arsitektur **Golang Modular Monolith (Clean Architecture)** di sisi backend yang dikombinasikan dengan **Asynchronous Distributed Task Queue (`Asynq` + Redis)** dan **Spatial Database (PostgreSQL + PostGIS)**.
-
-Pemilihan **Golang** memberikan keunggulan konkurensi tinggi (`goroutines` & `errgroup`) saat menarik dan menormalisasi data dari berbagai API cuaca eksternal secara simultan, konsumsi memori yang sangat hemat, *compile-time type safety* untuk mencegah korupsi data sensor/polutan (`NULL` handling), serta ukuran binary kontainer produksi yang sangat ringkas (~20 MB).
-
-### 1. High-Level System Architecture Diagram
+Weatherly dibangun sebagai platform web modern menggunakan **Next.js 16 + TypeScript (`apps/web`)** dan **Golang Modular Monolith (`backend/`)** dengan penyimpanan persisten. Karena Weatherly berfokus penuh pada **Web Platform** (tanpa aplikasi mobile), sistem notifikasi bekerja sebagai **In-App Web Weather Alert** pada lokasi-lokasi yang disimpan oleh pengguna terdaftar, tanpa memerlukan layanan push mobile eksternal (seperti FCM atau tabel registrasi perangkat mobile).
 
 ```mermaid
 flowchart TB
-    subgraph Clients["📱💻 Client Applications"]
-        Mobile["Flutter Mobile App\n(Android • GPS & Push Notification)"]
-        Web["Next.js + TypeScript Web App\n(Interactive Radar Map & Analytics Dashboard)"]
+    subgraph Client["Web Application (Next.js + TypeScript)"]
+        Landing["Landing Page (/)\nMaster-Detail 27 Kota/Kab & 627 Kecamatan,\nBerita Acara, Prakiraan Harian BMKG, Tanya AI"]
+        Dashboard["Web Dashboard (/dashboard)\nRadar Sebentar Lagi Hujan, Alert Lokasi Tersimpan,\nSmart Travel Builder, Laporan Warga Berfoto"]
+        AuthUI["Halaman Masuk & Daftar (/login)\nMode Tanpa Login (Guest) & Akun Personal"]
     end
 
-    subgraph Edge["🌐 Edge & Gateway"]
-        Nginx["Nginx Reverse Proxy\n(TLS/HTTPS • Rate Limiting • Static Assets)"]
+    subgraph WebAPI["Next.js App Router API & Go Backend"]
+        BMKGApi["GET /api/bmkg/jabar\nLive Sync BMKG 32 & 32.xx + Open-Meteo Current/AQI/UV + RSS Berita Acara"]
+        AIApi["POST /api/ai/insights\nTwo-Stage Weather Guardrail + Google Gemini 2.5 Flash"]
+        DBApi["GET & POST /api/db\nPersistent Storage: Users, Saved Alert Locations,\nSmart Travel Routes, Photo Community Reports, Saved AI"]
+        GoAPI["Golang Modular Monolith (/api/v1)\nWeather, Environment, Alerts, Flood, Travel & Community Services"]
     end
 
-    subgraph Backend["⚙️ Golang Modular Monolith (Gin + Clean Architecture)"]
-        API["HTTP Handlers & Middleware (/api/v1)\n(JWT Auth, Rate Limit, Request Validator)"]
-        Services["Domain Services Layer\n(Weather Engine • Rain Prediction • Alert Engine\nAI Analysis Adapter • Spatial Flood & Travel Service)"]
-        Repos["Repository & Spatial Data Layer\n(pgx/v5 Pool • PostGIS SQL • golang-migrate)"]
+    subgraph External["Sumber Data Resmi & Eksternal"]
+        BMKG["BMKG Provinsi Jawa Barat\n(bmkg.go.id/cuaca/prakiraan-cuaca/32 & 32.xx)"]
+        OpenMeteo["Open-Meteo Weather & Air Quality API\n(Suhu Aktual, AQI, PM2.5, PM10, NO2, O3, CO, SO2, UV)"]
+        NewsRSS["Portal Berita Resmi & RSS Jawa Barat\n(BMKG, BNPB, BPBD, Pemprov Jabar)"]
+        Gemini["Google Gemini API\n(gemini-2.5-flash Weather Advisor)"]
     end
 
-    subgraph AsyncWorkers["⏱️ Go Background Workers & Scheduler (Asynq)"]
-        Scheduler["Asynq Scheduler (Cron)\n(Periodic Ingestion & Alert Evaluation Trigger)"]
-        Worker["Asynq Concurrent Workers\n(Goroutine Data Normalization • Rain Nowcasting • Push Dispatch)"]
-    end
-
-    subgraph DataStore["🗄️ Persistence & Caching Layer"]
-        Postgres[("PostgreSQL 16 + PostGIS\n(Spatial Point 4326 • Relational & JSONB)")]
-        Redis[("Redis 7\n(Hot Weather Cache • Rate Limit • Asynq Broker)")]
-    end
-
-    subgraph External["☁️ External Data Providers & Services"]
-        BMKG["BMKG Open Data\n(Forecast & Extreme Weather Warnings)"]
-        OWM["OpenWeather / Tomorrow.io\n(Minutely Rain • AQI • UV Index)"]
-        FloodSrc["BNPB / BPBD & Radar Tile Providers\n(Official Flood Warnings & Precipitation Radar)"]
-        LLM["LLM Provider API\n(Go Adapter Pattern for Structured AI Insights)"]
-        FCM["Firebase Cloud Messaging (FCM)\n(Official Firebase Go SDK v4)"]
-    end
-
-    Mobile & Web -->|HTTPS REST / JSON| Nginx
-    Nginx --> API
-    API --> Services
-    Services --> Repos
-    Repos --> Postgres
-    Services <-->|Cache Hit/Miss| Redis
-
-    Scheduler -->|Enqueue Tasks| Redis
-    Redis -->|Process Jobs| Worker
-    Worker --> Services
-    Worker -->|Send Push| FCM
-    FCM -.->|Push Alert| Mobile
-
-    Services & Worker -->|Concurrent Fetch via errgroup| BMKG & OWM & FloodSrc
-    Services -->|Validated Weather Snapshot| LLM
+    Landing & Dashboard & AuthUI --> BMKGApi & AIApi & DBApi
+    Dashboard -.-> GoAPI
+    BMKGApi --> BMKG & OpenMeteo & NewsRSS
+    AIApi --> Gemini
 ```
 
-### 2. Two-Stage AI Weather Analysis Pipeline (Anti-Hallucination Design)
+---
 
-Weatherly **tidak** menggunakan AI untuk menebak angka prediksi hujan dari nol. Untuk menjamin keandalan ilmiah dan mencegah halusinasi data:
+## Modul Fitur Utama (*Feature Architecture*)
 
-```mermaid
-flowchart LR
-    A["📡 Multi-Source Weather Data\n(Temp, Minutely Rain, UV, AQI, Wind)"] --> B["🛡️ Stage 1: Go Deterministic Rule Engine\n(Validasi struct, normalisasi unit,\nthreshold scoring, & pointer NULL safety)"]
-    B --> C["🧠 Stage 2: AI Analysis Layer (Go LLM Adapter)\n(Menerima JSON snapshot tervalidasi,\nmeringkas konteks & menyusun rekomendasi)"]
-    C --> D[("💾 PostgreSQL ai_insights\n(Simpan input_snapshot + recommendation)")]
-    D --> E["📲 Smart Daily Insights\n(Rekomendasi aktivitas berkendara,\nolahraga, & peringatan dini)"]
-```
-
-> [!IMPORTANT]
-> **Prinsip Keamanan & Integritas Data AI:**
-> - AI hanya menerima `input_snapshot` terstruktur yang mencantumkan sumber provider, timestamp UTC, dan status kelengkapan data.
-> - Jika parameter (misal polutan `so2` atau radar menit ke-45) bernilai `nil` / `NULL` (direpresentasikan dengan pointer `*float64` di Go), AI wajib menyatakan data tidak tersedia — bukan mengarang angka estimasi.
-> - Tidak ada PII (*Personally Identifiable Information*) atau API secret yang pernah dimasukkan ke dalam `input_snapshot`.
+| # | Modul | Akses | Kapabilitas Utama |
+| :-: | :--- | :---: | :--- |
+| **1** | **27 Kota/Kab & 627 Kecamatan Jawa Barat** | `Publik (Tanpa Login)` | Pencarian real-time seluruh wilayah Jawa Barat dari BMKG Kode 32 beserta tabel lengkap seluruh kecamatan di tiap Kabupaten/Kota. |
+| **2** | **Berita Acara Cuaca & Bencana Jabar** | `Publik (Tanpa Login)` | Log berita cuaca ekstrem, peringatan dini BMKG, banjir, dan tanah longsor di Jawa Barat lengkap dengan tanggal laporan, tautan berita, dan sumber resmi. |
+| **3** | **Prakiraan Harian Resmi BMKG & Radar Tanda Hujan** | `Publik (Tanpa Login)` | Menampilkan suhu aktual saat ini, deteksi wilayah dengan tanda **Sebentar Lagi Hujan**, serta grafik prakiraan harian BMKG (`Hari Ini`, `Besok`, hingga `6 Hari ke Depan`). |
+| **4** | **Kualitas Udara (AQI) & Indeks UV Real-Time** | `Publik (Tanpa Login)` | Pemantauan `AQI`, `PM2.5`, `PM10`, `NO2`, `O3`, `CO`, `SO2`, dan `UV Index` secara live dari sensor atmosfer Open-Meteo sesuai koordinat wilayah. |
+| **5** | **Asisten Cuaca AI (`Tanya AI`)** | `Publik & Personal` | Menjawab kondisi cuaca saat ini terlebih dahulu lalu prediksi harian BMKG. Dilengkapi validasi topik ketat (hanya menjawab topik cuaca & lingkungan). |
+| **6** | **Alert Cuaca Real-Time Lokasi Tersimpan** | `Akun Personal` | Pengguna dapat menyimpan Kota/Kabupaten atau Kecamatan mana saja untuk memantau status peringatan cuaca real-time di bagian atas Dasbor. |
+| **7** | **Smart Travel Route (Buatan Pengguna)** | `Akun Personal` | Dimulai kosong tanpa data dummy; pengguna bebas memilih Titik Asal, Titik Transit, dan Titik Tujuan untuk memeriksa cuaca harian di sepanjang koridor perjalanan. |
+| **8** | **Community Weather Reports (Wajib Foto & Tanggal)** | `Akun Personal` | Laporan warga wajib melampirkan **foto bukti lapangan asli** dan otomatis mencatat **tanggal, bulan, serta tahun laporan**; pengguna lain dapat memberikan dukungan verifikasi (`1 akun = 1 dukungan`). |
 
 ---
 
-## 🧩 8 Modul Fitur Utama (*Feature Architecture*)
+## Mode Akses: Tanpa Login vs Akun Personal
 
-Weatherly dibangun di atas 8 modul domain yang saling terintegrasi, dibagi ke dalam kategori **Core**, **Intelligence**, dan **Supporting**:
+Weatherly menggunakan sistem **Tanpa Login (Guest Mode)** + **Akun Personal (Login / Registrasi)**:
 
-| # | Modul | Kategori | Fase Target | Kapabilitas Utama |
-| :-: | :--- | :---: | :---: | :--- |
-| **1** | **Rain Intelligence** | `Core` | **MVP (v1.0)** | Prediksi probabilitas hujan 10–60 menit ke depan (*nowcasting*), estimasi waktu kedatangan hujan, intensitas presipitasi (mm/jam), grafik tren, dan notifikasi pra-hujan. |
-| **2** | **Extreme Weather** | `Core` | **MVP (v1.0)** | Deteksi & peringatan dini hujan lebat, petir, angin kencang, serta sinkronisasi peringatan cuaca ekstrem resmi dari BMKG. |
-| **3** | **Air Quality Monitoring** | `Supporting` | **MVP (v1.0)** | Pemantauan AQI, PM2.5, PM10, NO2, O3, CO, SO2 (kolom tak tersedia disimpan `NULL` secara jujur), histori kualitas udara, dan rekomendasi aktivitas luar ruang. |
-| **4** | **UV Monitoring** | `Supporting` | **MVP (v1.0)** | Indeks UV *real-time* & prakiraan jam puncak UV tinggi, klasifikasi kategori risiko, serta panduan perlindungan kulit. |
-| **5** | **Flood Monitoring** | `Supporting` | **v1.5** | Peringatan banjir resmi (BNPB/BPBD), peta spasial area terdampak, laporan genangan, dan konteks curah hujan (*membedakan dengan tegas antara risiko curah hujan vs. kejadian banjir terkonfirmasi*). |
-| **6** | **AI Weather Insights** | `Intelligence` | **v1.5** | Sistem analisis otomatis berbasis konteks cuaca harian untuk menjawab kelayakan berkendara, waktu terbaik berolahraga, dan alasan ilmiah di balik peringatan hujan. |
-| **7** | **Smart Travel** | `Supporting` | **v2.0** | Analisis cuaca berbasis rute perjalanan (titik asal ke tujuan), estimasi probabilitas hujan di sepanjang koridor rute berdasarkan jam keberangkatan. |
-| **8** | **Community Reports** | `Supporting` | **v2.0** | Crowdsourcing laporan kondisi lokal (hujan lokal, banjir/genangan, pohon tumbang, angin kencang) lengkap dengan foto, koordinat PostGIS, sistem *up/down vote* (`UNIQUE(report_id, user_id)`), dan moderasi. |
-
-### ✅ Cakupan Wajib MVP (Version 1.0 Checklist)
-- [ ] **User Authentication**: Registrasi, login JWT (`golang-jwt/jwt/v5`) + Refresh Token, password hashing dengan Argon2id (`golang.org/x/crypto/argon2`), dan manajemen profil.
-- [ ] **Location Management**: Koordinat GPS *on-open* (tanpa *background tracking* invasif) dan penyimpanan lokasi favorit berbasis PostGIS `geography(Point, 4326)`.
-- [ ] **Live Weather Engine**: Normalisasi konkuren (`errgroup`) untuk suhu, kelembapan, kecepatan angin, dan kondisi cuaca aktual dari multi-provider.
-- [ ] **Rain Prediction**: Estimasi waktu turun hujan dan probabilitas presipitasi jangka pendek.
-- [ ] **Weather Alerts & Push Notification**: Alert Engine bebas duplikasi (*deduplicated*) menggunakan Go Asynq Worker yang terhubung ke Firebase Cloud Messaging (FCM).
-- [ ] **UV & Air Quality**: Integrasi metrik AQI, PM2.5, PM10, dan UV Index.
-- [ ] **Cross-Platform Dashboard**: Aplikasi mobile Flutter dan dashboard web Next.js yang responsif.
-- [ ] **Weather History**: Penyimpanan dan visualisasi riwayat observasi vs. akurasi prediksi.
+1. **Tanpa Login (Gratis & Instan)**
+   - Melihat cuaca saat ini & prakiraan harian BMKG di 27 Kota/Kabupaten dan 627 Kecamatan Jawa Barat.
+   - Melihat radar tanda hujan & Berita Acara Cuaca/Bencana Jawa Barat beserta tautan sumber.
+   - Mengecek indeks UV dan kualitas udara (`AQI`, `PM2.5`, `PM10`, `NO2`, `O3`, `CO`, `SO2`).
+   - Bertanya langsung kepada Asisten Cuaca AI (`Tanya AI`).
+2. **Akun Personal (Daftar & Masuk)**
+   - Menyimpan lokasi favorit mana saja untuk memantau **Alert Cuaca Real-Time** di Dasbor Web.
+   - Menyusun dan menyimpan rute perjalanan **Smart Travel** sendiri.
+   - Mengirim **Laporan Warga** dengan wajib bukti foto lapangan & tanggal laporan lengkap.
+   - Menyimpan riwayat analisis cuaca AI ke akun personal.
+   - *(Menu perbandingan Mode Akses otomatis disembunyikan setelah pengguna masuk ke akunnya).*
 
 ---
 
-## 🎨 Product Design & UI Preview
+## Desain Database & ERD
 
-Struktur antarmuka Weatherly dirancang sebagai **SaaS-style Weather Intelligence Dashboard** untuk Mobile (Flutter) dan Web (Next.js):
-- **Header & Location Switcher**: Lokasi aktif, koordinat GPS, dan timestamp pembaruan terakhir.
-- **Current Weather & Rain Alert Banner**: Suhu aktual, kelembapan, kecepatan angin, serta *countdown* estimasi kedatangan hujan berikutnya.
-- **Hourly Forecast & Weather Radar Map**: Grafik presipitasi per jam dan peta interaktif radar hujan.
-- **Environmental Indicators & AI Daily Insights**: Kartu indikator AQI (PM2.5/PM10), UV Index, peringatan aktif (*Active Alerts*), dan rekomendasi aktivitas harian berbasis AI.
-
-<div align="center">
-  <table>
-    <tr>
-      <td align="center" width="33%">
-        <img src="https://images.openai.com/static-rsc-4/VSJpQLrAf6EzvUGQVFTI_lhFnvrh6pFTWj7_EWHIh0JB6UBIGkrftZJO_XgAEq6NMh8iAVEaYFSlTOhRrtCC-mhETUSdUkHGb4Mm1Yum4lKwP_OckQYVhqJtBajVWivGw5gRSlrr5HXm5C3kfyxvV2AAWwUWtkeP0gu_gtahKFs?purpose=inline" alt="Mobile Weather UI Concept" width="100%" />
-        <br /><sub><b>Mobile UI Concept</b> — Hyperlocal Rain & Nowcasting</sub>
-      </td>
-      <td align="center" width="33%">
-        <img src="https://images.openai.com/static-rsc-4/3L7ZCjBUVzw_WiAARUWQRPGKDkQEVIJI-dKIwNLRpbjGGx7iJAJE4qSBkr_WzoDsL59T78DxkCTFKHplBaBG9QcWVxt8I_vNWLvi3rcMVriTmxheFSH0QFoY3kS1q3rE2XS-b5odO9gAPVBRjK3eUvVdcejVGs7971YuSdb1Xxw?purpose=inline" alt="Weather Radar Map Concept" width="100%" />
-        <br /><sub><b>Weather Radar App</b> — Live Precipitation & Storm Tracking</sub>
-      </td>
-      <td align="center" width="33%">
-        <img src="https://images.openai.com/static-rsc-4/sSpv6cHBxLBhASjAGV_KvOuA-qHziIXQUilSD5GrS_S4MxuCLrMSfY5Rum0UZ7Yi4tVMht2j7pbyIVUaqpEDvsajurasqis915tEAKRktV97uMmW42yImwfuP5oRNLQNDyNacIksGRefM2FzXyLslc4TLmWKDdGnFpwQ3KgbJWA?purpose=inline" alt="SaaS Weather Intelligence Dashboard" width="100%" />
-        <br /><sub><b>Web Intelligence Dashboard</b> — Multi-Metric SaaS View</sub>
-      </td>
-    </tr>
-    <tr>
-      <td align="center" width="33%">
-        <img src="https://images.openai.com/static-rsc-4/J8nIEOk-pbRKqyxpnU9c-ftTLd2iRwuAf_wLLpxa2VkG6POyGK0R8hXC8OzW3WSbV8D7WbGr2-GWoX0Dga5tEr9CB3J2Fpg9cLGj4q0Lic3SpOxKF4JjywIiGMAldNrwq8lioxLfTeOTDxIFpBale36KepuJiFss8TUVCL6dfAA?purpose=inline" alt="Weather Dashboard Concept" width="100%" />
-        <br /><sub><b>Analytics & Forecast View</b> — Hourly Curve & UV/Wind</sub>
-      </td>
-      <td align="center" width="33%">
-        <img src="https://images.openai.com/static-rsc-4/xBcDXa7XIc07AuHmSgGLXBf6MOeh-2yyT_x_CZOVfc-NQ7PtJEG_5B5nPIGAp5ROjPvz0WjoFGwaZQLQ9iZVbfaJeGQ9cl7SoPnzyFkKtLzyWQNixte1qKbFxrfDhTb4S0pZRwnUkvDPTFmtftDnftSQFuyMh2YQiJwmNgvrZOg?purpose=inline" alt="Live Weather and AQI Dashboard" width="100%" />
-        <br /><sub><b>Environmental & AQI</b> — PM2.5, PM10 & Air Quality Index</sub>
-      </td>
-      <td align="center" width="33%">
-        <img src="https://images.openai.com/static-rsc-4/nqMTXVNuNFZZp2r4Ti5EZnLDyV4EfIHt8BgAlCXL2YBZdlV-Ljg3mVhOq3poVTCFjJucxi5lexot_nFEOV5OBNMqzwMBLOawyWj1VXxhkFW-YNQ7QoaM4oMFVLDQMbsnw5tFDzb4miJdgideLZhysiHCmOQ_rl_N3MpVtypvU1M?purpose=inline" alt="Freemium SaaS Model" width="100%" />
-        <br /><sub><b>Freemium Consumer SaaS</b> — Tiered Intelligence Features</sub>
-      </td>
-    </tr>
-  </table>
-</div>
-
----
-
-## 🗄️ Desain Database & ERD (PostgreSQL + PostGIS)
-
-Seluruh tabel menggunakan `UUID` sebagai Primary Key, menyimpan waktu dalam format `UTC`, menggunakan indeks spasial dan temporal pada kolom lokasi serta waktu observasi, dan dikelola melalui **`golang-migrate` SQL Migrations**.
+Skema database dirancang ramping khusus untuk kebutuhan aplikasi web Weatherly (tabel perangkat push mobile `notification_devices` dan `notification_logs` telah dihapus karena platform berfokus penuh pada Web):
 
 ```mermaid
 erDiagram
-    USERS ||--o{ LOCATIONS : "owns"
-    USERS ||--o{ NOTIFICATION_DEVICES : "registers"
+    USERS ||--o{ LOCATIONS : "saves_for_alert"
     USERS ||--o{ TRAVEL_ROUTES : "creates"
-    USERS ||--o{ COMMUNITY_REPORTS : "submits"
-    USERS ||--o{ COMMUNITY_REPORT_VOTES : "submits"
-    USERS ||--o{ AI_INSIGHTS : "receives"
+    USERS ||--o{ COMMUNITY_REPORTS : "submits_with_photo"
+    USERS ||--o{ COMMUNITY_REPORT_VOTES : "supports"
+    USERS ||--o{ AI_INSIGHTS : "saves"
 
     LOCATIONS ||--o{ WEATHER_OBSERVATIONS : "has"
     LOCATIONS ||--o{ WEATHER_FORECASTS : "has"
@@ -217,8 +125,6 @@ erDiagram
     LOCATIONS ||--o{ FLOOD_REPORTS : "has"
     LOCATIONS ||--o{ AI_INSIGHTS : "analyzes"
 
-    WEATHER_ALERTS ||--o{ NOTIFICATION_LOGS : "triggers"
-    NOTIFICATION_DEVICES ||--o{ NOTIFICATION_LOGS : "receives"
     TRAVEL_ROUTES ||--o{ ROUTE_WEATHER_CHECKS : "analyzes"
     COMMUNITY_REPORTS ||--o{ COMMUNITY_REPORT_VOTES : "receives"
 
@@ -233,52 +139,10 @@ erDiagram
         uuid id PK
         uuid user_id FK
         varchar name
+        varchar region_code
         geography_point_4326 coordinates
         boolean is_favorite
         timestamp created_at
-    }
-    WEATHER_OBSERVATIONS {
-        uuid id PK
-        uuid location_id FK
-        float temperature_c
-        float humidity_pct
-        float wind_speed_kmh
-        float precipitation_mm
-        varchar condition_code
-        varchar provider
-        timestamp observed_at
-    }
-    WEATHER_FORECASTS {
-        uuid id PK
-        uuid location_id FK
-        varchar granularity
-        float temp_c
-        float rain_probability
-        float precipitation_mm
-        varchar provider
-        timestamp target_time
-        timestamp fetched_at
-    }
-    AIR_QUALITY_OBSERVATIONS {
-        uuid id PK
-        uuid location_id FK
-        int aqi
-        float pm25
-        float pm10
-        float no2
-        float o3
-        float co
-        float so2
-        varchar provider
-        timestamp observed_at
-    }
-    UV_OBSERVATIONS {
-        uuid id PK
-        uuid location_id FK
-        float uv_index
-        varchar uv_category
-        varchar provider
-        timestamp observed_at
     }
     WEATHER_ALERTS {
         uuid id PK
@@ -291,290 +155,108 @@ erDiagram
         timestamp starts_at
         timestamp expires_at
     }
-    FLOOD_REPORTS {
-        uuid id PK
-        uuid location_id FK
-        varchar source
-        varchar source_type
-        varchar flood_level
-        text description
-        decimal latitude
-        decimal longitude
-        boolean verified
-        timestamp reported_at
-    }
     COMMUNITY_REPORTS {
         uuid id PK
         uuid user_id FK
         varchar report_type
         text description
-        decimal latitude
-        decimal longitude
         text image_url
-        varchar verification_status
-        timestamp created_at
-    }
-    COMMUNITY_REPORT_VOTES {
-        uuid id PK
-        uuid report_id FK
-        uuid user_id FK
-        varchar vote_type
+        varchar report_date
+        int upvotes
         timestamp created_at
     }
     TRAVEL_ROUTES {
         uuid id PK
         uuid user_id FK
         varchar route_name
-        decimal origin_lat
-        decimal origin_lon
-        decimal destination_lat
-        decimal destination_lon
+        varchar origin_adm2
+        varchar mid_adm2
+        varchar dest_adm2
         timestamp created_at
-    }
-    ROUTE_WEATHER_CHECKS {
-        uuid id PK
-        uuid route_id FK
-        varchar weather_condition
-        float rain_probability
-        timestamp estimated_at
-        timestamp created_at
-    }
-    NOTIFICATION_DEVICES {
-        uuid id PK
-        uuid user_id FK
-        varchar fcm_token UK
-        varchar platform
-        boolean is_active
-        timestamp registered_at
-    }
-    NOTIFICATION_LOGS {
-        uuid id PK
-        uuid alert_id FK
-        uuid device_id FK
-        varchar status
-        timestamp sent_at
     }
     AI_INSIGHTS {
         uuid id PK
         uuid user_id FK
-        uuid location_id FK
-        varchar insight_type
-        jsonb input_snapshot
-        text analysis_result
-        jsonb recommendation
-        varchar model_name
+        varchar location_name
+        text question
+        text answer
         timestamp created_at
     }
 ```
 
 ---
 
-## 🔌 API Contract & Endpoints (`/api/v1`)
+## API Contract & Endpoints
 
-Seluruh endpoint berada di bawah prefix `/api/v1` dan menggunakan autentikasi `Bearer JWT` untuk rute yang mengakses profil, perangkat, atau lokasi tersimpan.
+### 1. Next.js Web Application API (`apps/web/src/app/api`)
+| Endpoint | Method | Deskripsi |
+| :--- | :---: | :--- |
+| `/api/bmkg/jabar` | `GET` | Mengambil prakiraan harian BMKG untuk 27 Kota/Kabupaten (`32`), seluruh Kecamatan (`32.xx`), cuaca & AQI/UV real-time Open-Meteo, serta RSS Berita Acara Jawa Barat. |
+| `/api/ai/insights` | `POST` | Endpoint `Tanya AI` dengan guardrail khusus topik cuaca, menjawab kondisi aktual terlebih dahulu lalu prediksi harian BMKG menggunakan Gemini 2.5 Flash. |
+| `/api/db` | `GET` / `POST` | Operasi database persisten untuk registrasi akun, login, simpan lokasi alert, tambah/hapus rute Smart Travel, laporan warga wajib foto, voting laporan, dan simpan analisis AI. |
 
+### 2. Golang Backend REST API (`backend/` — `/api/v1`)
 | Domain Modul | Method | Endpoint | Deskripsi |
 | :--- | :---: | :--- | :--- |
-| **Auth** | `POST` | `/api/v1/auth/register` | Registrasi akun pengguna baru (Argon2id password hashing) |
-| **Auth** | `POST` | `/api/v1/auth/login` | Autentikasi pengguna & penerbitan JWT Access + Refresh Token |
-| **Auth** | `GET` | `/api/v1/auth/me` | Profil dan preferensi pengguna yang sedang login |
-| **Location** | `GET` | `/api/v1/locations` | Daftar lokasi pemantauan & lokasi favorit pengguna |
-| **Location** | `POST` | `/api/v1/locations` | Menyimpan lokasi baru (koordinat GPS / nama wilayah) |
-| **Location** | `PATCH` | `/api/v1/locations/{id}` | Memperbarui label atau status favorit lokasi |
-| **Weather** | `GET` | `/api/v1/weather/current` | Kondisi cuaca aktual yang telah dinormalisasi |
-| **Weather** | `GET` | `/api/v1/weather/forecast` | Prakiraan cuaca per jam (*hourly*) dan harian (*daily*) |
-| **Weather** | `GET` | `/api/v1/weather/minutely` | Presipitasi per menit (10–60 menit ke depan) |
-| **Weather** | `GET` | `/api/v1/weather/radar` | Metadata & layer tile radar presipitasi wilayah Indonesia |
-| **Rain** | `GET` | `/api/v1/rain/prediction` | Analisis kedatangan hujan, probabilitas, dan kurva intensitas |
-| **Rain** | `GET` | `/api/v1/rain/history` | Histori presipitasi & perbandingan akurasi prediksi vs. observasi |
-| **Air Quality** | `GET` | `/api/v1/air-quality/current` | Indeks AQI dan polutan (`pm25`, `pm10`, `no2`, `o3`, `co`, `so2`) |
-| **Air Quality** | `GET` | `/api/v1/air-quality/history` | Tren kualitas udara historis pada lokasi pemantauan |
-| **UV** | `GET` | `/api/v1/uv/current` | UV Index saat ini beserta kategori risiko dan saran proteksi |
-| **UV** | `GET` | `/api/v1/uv/forecast` | Prakiraan jam puncak UV sepanjang hari |
-| **Alerts** | `GET` | `/api/v1/alerts` | Daftar peringatan cuaca aktif pada lokasi pengguna |
-| **Alerts** | `GET` | `/api/v1/alerts/{id}` | Detail peringatan cuaca ekstrem dan instruksi keselamatan |
-| **Flood** | `GET` | `/api/v1/flood/nearby` | Informasi banjir & genangan di sekitar koordinat (`source_type` terklasifikasi) |
-| **Flood** | `POST` | `/api/v1/flood/reports` | Mengirim laporan genangan/banjir untuk diverifikasi |
-| **AI Insights** | `GET` | `/api/v1/insights/daily` | Ringkasan analisis cuaca harian dan rekomendasi aktivitas |
-| **AI Insights** | `POST` | `/api/v1/insights/generate` | Memicu pembuatan analisis AI berbasis snapshot cuaca terbaru |
-| **Travel** | `POST` | `/api/v1/travel/routes` | Menyimpan koridor rute perjalanan (asal & tujuan) |
-| **Travel** | `GET` | `/api/v1/travel/{id}/weather` | Estimasi cuaca dan risiko hujan sepanjang titik rute perjalanan |
-| **Community** | `GET` | `/api/v1/community/reports` | Daftar laporan cuaca lokal dari komunitas sekitar |
-| **Community** | `POST` | `/api/v1/community/reports` | Membuat laporan komunitas (hujan lokal, pohon tumbang, angin, banjir) |
-| **Community** | `POST` | `/api/v1/community/reports/{id}/vote` | Memberikan *upvote/downvote* verifikasi laporan (`UNIQUE` per user) |
-| **Notification** | `POST` | `/api/v1/devices/register` | Mendaftarkan token FCM perangkat untuk push notification |
-| **Notification** | `GET` | `/api/v1/notifications` | Riwayat notifikasi peringatan cuaca yang dikirim ke pengguna |
-
-<details>
-<summary><b>📄 Contoh Kontrak JSON Response: <code>GET /api/v1/insights/daily</code></b></summary>
-
-```json
-{
-  "location": "Bandung",
-  "summary": "Potensi hujan meningkat pada sore hari.",
-  "insights": [
-    {
-      "type": "rain",
-      "severity": "medium",
-      "recommendation": "Siapkan payung sebelum bepergian."
-    },
-    {
-      "type": "uv",
-      "severity": "high",
-      "recommendation": "Gunakan perlindungan dari paparan UV."
-    }
-  ],
-  "generated_at": "2026-11-24T06:00:00Z"
-}
-```
-</details>
+| **Health** | `GET` | `/api/v1/health` | Status kesehatan layanan backend |
+| **Auth** | `POST` | `/api/v1/auth/register` | Registrasi akun pengguna baru |
+| **Auth** | `POST` | `/api/v1/auth/login` | Autentikasi pengguna & penerbitan JWT |
+| **Auth** | `GET` | `/api/v1/auth/me` | Profil pengguna yang sedang login |
+| **Location** | `GET` / `POST` / `PATCH` | `/api/v1/locations` | Manajemen lokasi tersimpan untuk peringatan cuaca web |
+| **Weather & Rain** | `GET` | `/api/v1/weather/current`, `/forecast`, `/radar` | Observasi cuaca aktual, prakiraan, dan radar presipitasi |
+| **Air Quality & UV** | `GET` | `/api/v1/air-quality/current`, `/api/v1/uv/current` | Indeks AQI, polutan udara, dan UV Index |
+| **Web Alerts** | `GET` | `/api/v1/alerts`, `/api/v1/alerts/{id}` | Daftar peringatan cuaca aktif dengan kunci deduplikasi |
+| **Flood & AI** | `GET` / `POST` | `/api/v1/flood/nearby`, `/api/v1/insights/daily` | Pemantauan hidrometeorologi & analisis cuaca harian |
+| **Travel & Community** | `GET` / `POST` | `/api/v1/travel/routes`, `/api/v1/community/reports` | Rute perjalanan pengguna & laporan komunitas terverifikasi |
 
 ---
 
-## 📂 Struktur Monorepo (*Repository Structure*)
+## Struktur Repository (*Repository Structure*)
 
 ```text
 weatherly/
 ├── apps/
-│   ├── mobile/                     # Flutter Android Application
-│   └── web/                        # Next.js + TypeScript Web Dashboard
+│   └── web/                        # Next.js 16 + TypeScript Web Platform
+│       ├── src/app/                # Landing Page (/), Dashboard (/dashboard), Login (/login), API Routes
+│       ├── src/components/         # Navigasi utama (SiteNav)
+│       └── src/lib/                # Snapshot 27 Kota/Kab & 627 Kecamatan BMKG 32, Berita Acara, Session
 │
 ├── backend/                        # Golang Modular Monolith (Clean Architecture)
-│   ├── cmd/
-│   │   ├── api/
-│   │   │   └── main.go             # Entrypoint HTTP REST Server (Gin)
-│   │   └── worker/
-│   │       └── main.go             # Entrypoint Background Worker & Scheduler (Asynq)
-│   ├── internal/
-│   │   ├── config/                 # Environment & App Configuration
-│   │   ├── database/               # PostgreSQL (pgxpool) & Redis Connection Setup
-│   │   ├── middleware/             # JWT Auth, Rate Limiter, Structured Logging, CORS
-│   │   ├── domain/                 # Core Entities & Repository/Service Interfaces
-│   │   ├── dto/                    # Request & Response Payloads + Validator
-│   │   ├── handler/                # HTTP Handlers (/api/v1: auth, users, locations,
-│   │   │                           # weather, rain, air_quality, uv, alerts, flood,
-│   │   │                           # insights, travel, community, notifications)
-│   │   ├── service/                # Business Logic (weather engine, rain prediction,
-│   │   │                           # air_quality, uv, flood, ai adapter, travel, alerts)
-│   │   ├── repository/             # PostgreSQL + PostGIS Spatial Queries (pgx)
-│   │   ├── provider/               # External Clients (BMKG, OpenWeather, BNPB, LLM, FCM)
-│   │   └── worker/                 # Asynq Task Handlers & Periodic Cron Jobs
-│   ├── migrations/                 # SQL Migrations (golang-migrate: *.up.sql / *.down.sql)
-│   ├── pkg/                        # Shared Utilities (argon2id, jwt, geo, api response)
-│   ├── go.mod
-│   ├── go.sum
-│   └── Dockerfile                  # Multi-stage Go Build -> Minimal Alpine/Distroless Binary
-│
-├── infrastructure/
-│   ├── docker/                     # Dockerfiles & Compose overrides
-│   ├── nginx/                      # Reverse Proxy & TLS configuration
-│   └── monitoring/                 # Healthchecks, logging & metrics configuration
+│   ├── cmd/api/                    # HTTP REST Server (/api/v1)
+│   ├── cmd/worker/                 # Background Weather & Alert Evaluator
+│   ├── internal/                   # Config, Domain, Handler, Service, Repository, Provider
+│   └── migrations/                 # SQL Migrations (13 Tabel Web & PostGIS)
 │
 ├── docs/
-│   ├── architecture/               # Dokumentasi Arsitektur Sistem & Data Pipeline
-│   ├── product/                    # Blueprint Produk & Spesifikasi Fitur
-│   ├── database/                   # Skema ERD, PostGIS & Kebijakan Retensi Data
-│   ├── api/                        # Spesifikasi OpenAPI & Kontrak Endpoint
-│   └── deployment/                 # Panduan Workflow Git, CI/CD & Produksi
+│   ├── architecture/               # Spesifikasi Arsitektur Sistem
+│   └── deployment/                 # Panduan Engineering Workflow & CI/CD
 │
-├── scripts/                        # Utilitas automasi database, seed & evaluasi prediksi
-├── .github/
-│   └── workflows/                  # GitHub Actions CI/CD Pipelines (Go Backend, Web, Mobile)
-├── .env.example                    # Template Environment Variables
-├── docker-compose.yml              # Local Full-Stack Orchestration (PostGIS, Redis, Go API, Worker, Web)
+├── .github/workflows/              # GitHub Actions CI/CD (Go Backend & Next.js Web)
+├── docker-compose.yml              # Orkestrasi PostGIS, Redis, Go API, dan Next.js Web
 └── README.md
 ```
 
 ---
 
-## 🔄 Development Workflow & CI/CD
+## Development Workflow & CI/CD
 
-Weatherly menerapkan disiplin rekayasa perangkat lunak modern melalui **GitFlow yang disederhanakan** dan **GitHub Actions CI/CD Pipelines** otomatis.
-
-### 1. Standar Git Branching
-* `main` — Branch produksi (*production-ready*). Setiap push/merge ke `main` memicu pipeline validasi rilis dan build image Docker produksi.
-* `develop` — Branch integrasi utama tempat seluruh fitur yang telah lulus CI digabungkan.
-* `feature/<nama-fitur>` — Branch pengembangan per fitur (contoh: `feature/weather-api`, `feature/rain-prediction`).
-* `fix/<nama-bug>` — Branch perbaikan bug terisolasi (contoh: `fix/notification-duplicate`).
-
-> **Aturan Commit & PR:** Satu fitur dikerjakan, diuji secara lokal, lalu diajukan melalui Pull Request ke `develop`. Hindari menggabungkan banyak modul yang tidak berhubungan dalam satu commit.
-
-### 2. GitHub Actions Workflows (`.github/workflows/`)
-Repositori ini dilengkapi dengan workflow otomatis di `.github/workflows/`:
-1. **`ci.yml` (Continuous Integration — Monorepo Pipeline)**:
-   - **Path Filtering & Smart Change Detection**: Mengecek kesiapan modul di `backend/` (`go.mod`), `apps/web/` (`package.json`), dan `apps/mobile/` (`pubspec.yaml`).
-   - **Golang Backend Job**: Menjalankan `go vet`, `golangci-lint`, migrasi database `golang-migrate`, dan `go test -v -race ./...` dengan service container **PostgreSQL + PostGIS (`postgis/postgis:16-3.4`)** serta **Redis 7**.
-   - **Web Job**: Menjalankan instalasi dependensi, `tsc --noEmit` (*TypeScript check*), `eslint`, dan build verifikasi Next.js.
-   - **Mobile Job**: Menjalankan `flutter analyze` dan `flutter test` untuk memastikan kualitas aplikasi Android.
-2. **`cd-release.yml` (Continuous Delivery & Container Build)**:
-   - Membangun dan memvalidasi multi-stage Docker image untuk `backend` (Go binary) dan `web` (Next.js), serta menyiapkan *release artifact* saat tag versi (`v*.*.*`) dibuat.
-
----
-
-## 🚀 Quick Start (Local Development)
-
-### Prasyarat
-- **Docker & Docker Compose** (v2.20+)
-- **Go 1.23+** (untuk pengembangan lokal `backend/`)
-- **Node.js 20+** (untuk pengembangan lokal `apps/web/`)
-- **Flutter SDK 3.22+** (untuk pengembangan lokal `apps/mobile/`)
-
-### Menjalankan Seluruh Infrastruktur dengan Docker Compose
+### Menjalankan Aplikasi Web Secara Lokal
 ```bash
-# 1. Clone repository
-git clone git@github.com:afrizadwi21/weatherly.git
-cd weatherly
+# 1. Masuk ke direktori web
+cd apps/web
 
-# 2. Salin template environment variables
-cp .env.example .env
-
-# 3. Jalankan PostgreSQL+PostGIS, Redis, Go API Server, Go Asynq Worker, dan Next.js Web
-docker compose up --build -d
-
-# 4. Jalankan migrasi database SQL (golang-migrate)
-docker compose run --rm migrate up
+# 2. Instal dependensi & jalankan server pengembangan
+npm install
+npm run dev
 ```
 
-Layanan akan tersedia pada:
-- **Golang API Server**: `http://localhost:8080/api/v1`
-- **Next.js Web Dashboard**: `http://localhost:3000`
-- **PostgreSQL + PostGIS**: `localhost:5432`
-- **Redis Broker & Cache**: `localhost:6379`
-
----
-
-## 🗺️ 12-Week Engineering Roadmap
-
-```mermaid
-flowchart LR
-    P1["Phase 1 (Minggu 1–2)\nFoundation, Go Setup,\nPostGIS, Auth & Location API"] --> P2["Phase 2 (Minggu 3–4)\nBMKG & OpenWeather\nGo Concurrent Engine + Redis"]
-    P2 --> P3["Phase 3 (Minggu 5–6)\nRain Prediction, Alerts,\nAsynq Worker & FCM Push"]
-    P3 --> P4["Phase 4 (Minggu 7–8)\nAQI, UV, Radar,\nHistory & Flood Basic"]
-    P4 --> P5["Phase 5 (Minggu 9–10)\nFlutter Mobile App &\nNext.js Web Dashboard"]
-    P5 --> P6["Phase 6 (Minggu 11)\nAI Weather Insights &\nAccuracy Evaluation"]
-    P6 --> P7["Phase 7 (Minggu 12)\nDocker Production,\nHTTPS, APK & Release V1.0"]
-```
-
-| Versi Rilis | Fokus Pengembangan |
-| :---: | :--- |
-| **V1.0 (MVP)** | Live Weather, Rain Prediction (Nowcasting), Weather Alerts + FCM, UV Index, Air Quality (AQI), Mobile & Web Dashboard, Weather History. |
-| **V1.5** | Flood Monitoring terintegrasi (BNPB/BPBD + spasial) & AI Weather Insights penuh. |
-| **V2.0** | Smart Travel (cuaca sepanjang koridor rute perjalanan) & Community Reports dengan sistem voting/moderasi. |
-| **V2.5** | Evaluasi & kalibrasi model prediksi menggunakan dataset observasi historis lokal Bandung. |
-| **V3.0** | Personalisasi profil aktivitas pengguna dan ekspansi cakupan wilayah nasional. |
-
----
-
-## 🔒 Standar Keamanan & Reliabilitas (*Security & Reliability*)
-
-- **Authentication & Password**: JWT (`golang-jwt/jwt/v5` dengan *short-lived access token* + *rotating refresh token*) dan hashing password dengan **Argon2id** (`golang.org/x/crypto/argon2`).
-- **Location Privacy**: Tidak melakukan pelacakan lokasi latar belakang tanpa izin eksplisit; MVP menggunakan lokasi saat aplikasi dibuka (*on-open*) atau titik lokasi favorit yang disimpan pengguna.
-- **Alert Deduplication**: Setiap peringatan cuaca memiliki kunci deterministik (`dedup_key`) sehingga pengguna tidak pernah menerima spam notifikasi duplikat untuk kejadian cuaca yang sama.
-- **Background Job Resilience**: Worker Go (`Asynq`) dilengkapi mekanisme *exponential backoff retry*, *context timeout guard*, dan *graceful degradation* ketika salah satu API cuaca eksternal mengalami gangguan.
+### GitHub Actions Workflows (`.github/workflows/`)
+- **`ci.yml`**: Menjalankan pengujian otomatis untuk **Golang Backend** (`go vet`, `golangci-lint`, migrasi SQL, `go test -race`) dan **Next.js Web** (`tsc --noEmit`, `eslint`, `npm run build`).
+- **`cd-release.yml`**: Memvalidasi konfigurasi Docker Compose serta membangun container produksi untuk `backend` dan `apps/web`.
 
 ---
 
 <div align="center">
-  <b>Weatherly Platform</b> — Built as a Production-Grade Full-Stack Weather Intelligence Portfolio.<br/>
-  <sub>Powered by Golang, PostgreSQL/PostGIS, Redis, Next.js, and Flutter • Initial Region: Bandung, Indonesia 🇮🇩</sub>
+  <b>Weatherly Web Platform</b> — Know the Weather. Prepare Before It Happens.<br/>
+  <sub>Cakupan Penuh Provinsi Jawa Barat (BMKG Kode 32 • 27 Kota/Kabupaten • 627 Kecamatan)</sub>
 </div>

@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 2. Locations Table (PostGIS Geography Point 4326)
+-- 2. Locations Table (Saved Locations for Real-Time Web Weather Alerts)
 CREATE TABLE IF NOT EXISTS locations (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS weather_observations (
 );
 CREATE INDEX IF NOT EXISTS idx_weather_obs_loc_time ON weather_observations(location_id, observed_at DESC);
 
--- 4. Weather Forecasts Table (Hourly, Minutely, Daily Predictions)
+-- 4. Weather Forecasts Table (Daily & Multi-Day BMKG Predictions)
 CREATE TABLE IF NOT EXISTS weather_forecasts (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     location_id UUID NOT NULL REFERENCES locations(id) ON DELETE CASCADE,
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS weather_forecasts (
 );
 CREATE INDEX IF NOT EXISTS idx_weather_fc_loc_target ON weather_forecasts(location_id, granularity, target_time);
 
--- 5. Weather Alerts Table (With Deduplication Key)
+-- 5. Weather Alerts Table (Web Real-Time Weather Alerts with Deduplication Key)
 CREATE TABLE IF NOT EXISTS weather_alerts (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     location_id UUID NOT NULL REFERENCES locations(id) ON DELETE CASCADE,
@@ -71,22 +71,3 @@ CREATE TABLE IF NOT EXISTS weather_alerts (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 CREATE INDEX IF NOT EXISTS idx_weather_alerts_loc_exp ON weather_alerts(location_id, expires_at DESC);
-
--- 6. Notification Devices & 7. Notification Logs
-CREATE TABLE IF NOT EXISTS notification_devices (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    fcm_token VARCHAR(512) NOT NULL UNIQUE,
-    platform VARCHAR(32) NOT NULL DEFAULT 'android',
-    is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    registered_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS notification_logs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    alert_id UUID NOT NULL REFERENCES weather_alerts(id) ON DELETE CASCADE,
-    device_id UUID NOT NULL REFERENCES notification_devices(id) ON DELETE CASCADE,
-    status VARCHAR(32) NOT NULL,
-    sent_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE (alert_id, device_id)
-);

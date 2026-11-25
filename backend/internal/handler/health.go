@@ -61,8 +61,6 @@ func NewMux(cfg *config.Config) *http.ServeMux {
 
 	mux.HandleFunc("GET /api/v1/alerts", alertHandler.ListAlerts)
 	mux.HandleFunc("GET /api/v1/alerts/{id}", alertHandler.GetAlert)
-	mux.HandleFunc("POST /api/v1/devices/register", alertHandler.RegisterDevice)
-	mux.HandleFunc("GET /api/v1/notifications", alertHandler.ListNotifications)
 
 	mux.HandleFunc("GET /api/v1/flood/nearby", intelHandler.FloodNearby)
 	mux.HandleFunc("POST /api/v1/flood/reports", intelHandler.CreateFloodReport)

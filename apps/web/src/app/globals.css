@@ -9,20 +9,243 @@
   --paper-hover: #e5e2da;
   --ink: #141413;
   --ink-secondary: #4a4946;
-  --ink-muted: #76746f;
+  --ink-muted: #6e6c67;
   --rule: #d4d1c8;
   --rule-strong: #141413;
 
   --signal-red: #c93b2b;
   --signal-red-Tint: #fbeae8;
-  --signal-amber: #b86b14;
+  --signal-red-tint: #fbeae8;
+  --signal-amber: #9c5a0f;
   --signal-amber-tint: #fdf3e7;
   --signal-green: #1f6b45;
   --signal-green-tint: #eaf5ef;
 
+  --code-bg: #171716;
+  --code-ink: #e9e7e0;
+  --code-muted: #9a978f;
+
+  --nav-h: 64px;
+  --gutter: clamp(20px, 4vw, 56px);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
   --font-display: var(--font-space-grotesk), "Plus Jakarta Sans", system-ui, sans-serif;
   --font-body: var(--font-jakarta), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-jetbrains-mono), monospace;
+}
+
+/* Night reading: same folio, carbon paper with chalk ink. Signals lifted for contrast. */
+html[data-theme="dark"] {
+  --paper: #151513;
+  --paper-alt: #1c1c1a;
+  --paper-hover: #262623;
+  --ink: #ecebe5;
+  --ink-secondary: #bdbab2;
+  --ink-muted: #8f8c85;
+  --rule: #34332f;
+  --rule-strong: #ecebe5;
+
+  --signal-red: #ec6a58;
+  --signal-red-Tint: #2e1915;
+  --signal-red-tint: #2e1915;
+  --signal-amber: #e09a45;
+  --signal-amber-tint: #2b2114;
+  --signal-green: #5cba8a;
+  --signal-green-tint: #15261d;
+
+  --code-bg: #0d0d0c;
+  --code-ink: #e9e7e0;
+  --code-muted: #8f8c85;
+
+  color-scheme: dark;
+}
+
+html {
+  scroll-padding-top: calc(var(--nav-h) + 16px);
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--paper-alt);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--rule);
+  border: 2px solid var(--paper-alt);
+}
+html {
+  scrollbar-color: var(--rule) var(--paper-alt);
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+/* ============================================================================
+   SITE NAV — ruled masthead bar, shared by landing, dashboard and login
+   ============================================================================ */
+
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--paper);
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.site-nav__bar {
+  height: var(--nav-h);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 var(--gutter);
+}
+
+.site-nav__brand {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+  color: var(--ink);
+  margin-right: 8px;
+}
+
+.site-nav__links {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+  gap: 4px;
+  flex: 1;
+}
+
+.site-nav__link {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink-secondary);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.site-nav__link:hover {
+  color: var(--ink);
+}
+
+.site-nav__link[aria-current] {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+.site-nav__link--plain {
+  height: auto;
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.site-nav__link--plain[aria-current] {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+
+.site-nav__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.site-nav__menu-btn {
+  display: none;
+}
+
+.site-nav__drawer {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--rule);
+  padding: 8px var(--gutter) 16px;
+}
+
+.site-nav__drawer[hidden] {
+  display: none;
+}
+
+.site-nav__drawer-link {
+  padding: 12px 0;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+}
+
+.site-nav__drawer-link:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 1080px) {
+  .site-nav__links {
+    display: none;
+  }
+  .site-nav__menu-btn {
+    display: inline-flex;
+  }
+}
+
+@media (min-width: 1081px) {
+  .site-nav__drawer {
+    display: none !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .site-nav__actions .site-nav__link--plain {
+    display: none;
+  }
+}
+
+.icon-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.icon-btn:hover {
+  border-color: var(--ink);
+  background: var(--paper-alt);
+}
+
+.icon-btn.site-nav__menu-btn {
+  display: none;
+}
+
+@media (max-width: 1080px) {
+  .icon-btn.site-nav__menu-btn {
+    display: inline-flex;
+  }
 }
 
 *,
@@ -69,9 +292,8 @@ body {
    ============================================================================ */
 
 .folio-wrapper {
-  max-width: 1360px;
-  margin: 0 auto;
-  padding: 24px;
+  width: 100%;
+  padding: 24px var(--gutter);
 }
 
 .folio-sheet {
@@ -575,6 +797,48 @@ body {
 .btn-ink:hover {
   background-color: var(--signal-red);
   border-color: var(--signal-red);
+}
+
+a.btn-ink,
+a.btn-line {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.btn-sm {
+  padding: 7px 14px;
+}
+
+.btn-lg {
+  padding: 13px 22px;
+  font-size: 0.95rem;
+}
+
+.btn-line {
+  appearance: none;
+  background-color: transparent;
+  color: var(--ink);
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+  padding: 13px 22px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-line:hover {
+  background-color: var(--ink);
+  color: var(--paper);
+}
+
+.btn-ink:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .btn-outline {

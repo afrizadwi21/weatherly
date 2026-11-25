@@ -1,16 +1,13 @@
 package handler
 
 import (
-	"encoding/json"
 	"net/http"
-	"strings"
 
 	"github.com/afrizadwi21/weatherly/backend/internal/config"
-	"github.com/afrizadwi21/weatherly/backend/internal/domain"
 	"github.com/afrizadwi21/weatherly/backend/internal/service"
 )
 
-// AlertHandler exposes Extreme Weather Alerts (/api/v1/alerts*) and Push Notification (/api/v1/devices*, /notifications) endpoints.
+// AlertHandler exposes Extreme Weather Alerts (/api/v1/alerts*) endpoints for the Web platform.
 type AlertHandler struct {
 	cfg *config.Config
 	svc *service.AlertService
@@ -35,34 +32,4 @@ func (h *AlertHandler) GetAlert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, alert)
-}
-
-// RegisterDevice handles POST /api/v1/devices/register.
-func (h *AlertHandler) RegisterDevice(w http.ResponseWriter, r *http.Request) {
-	claims, err := extractBearerClaims(r, h.cfg.JWTSecretKey)
-	if err != nil {
-		writeJSONError(w, http.StatusUnauthorized, err.Error())
-		return
-	}
-
-	var req domain.RegisterDeviceRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || strings.TrimSpace(req.FCMToken) == "" {
-		writeJSONError(w, http.StatusBadRequest, "valid fcm_token is required")
-		return
-	}
-
-	dev := h.svc.RegisterDevice(claims.UserID, req)
-	writeJSON(w, http.StatusCreated, dev)
-}
-
-// ListNotifications handles GET /api/v1/notifications.
-func (h *AlertHandler) ListNotifications(w http.ResponseWriter, r *http.Request) {
-	claims, err := extractBearerClaims(r, h.cfg.JWTSecretKey)
-	if err != nil {
-		writeJSONError(w, http.StatusUnauthorized, err.Error())
-		return
-	}
-
-	logs := h.svc.ListNotifications(claims.UserID)
-	writeJSON(w, http.StatusOK, map[string]any{"notifications": logs})
 }

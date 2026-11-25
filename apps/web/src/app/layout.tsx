@@ -4,7 +4,7 @@ import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["600", "700"],
+  weight: ["500", "600", "700"],
   variable: "--font-space-grotesk",
   display: "swap",
 });
@@ -26,8 +26,11 @@ const jetBrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Weatherly — Know the Weather. Prepare Before It Happens.",
   description:
-    "Full-Stack Weather Intelligence Platform for Hyperlocal Rain Nowcasting, Environmental Monitoring, Proactive Alerts, and AI-Driven Daily Decisions in Bandung, Indonesia.",
+    "Weatherly memperkirakan kapan hujan tiba di titik Anda 10–60 menit sebelumnya, lengkap dengan peringatan BMKG, kualitas udara, UV, banjir, dan rekomendasi harian untuk Cekungan Bandung.",
 };
+
+/* Applies the saved (or system) theme before first paint, so there is no light flash in dark mode. */
+const themeScript = `try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.dataset.theme=t}catch(e){document.documentElement.dataset.theme='light'}`;
 
 export default function RootLayout({
   children,
@@ -37,8 +40,12 @@ export default function RootLayout({
   return (
     <html
       lang="id"
+      suppressHydrationWarning
       className={`${spaceGrotesk.variable} ${plusJakartaSans.variable} ${jetBrainsMono.variable}`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>{children}</body>
     </html>
   );

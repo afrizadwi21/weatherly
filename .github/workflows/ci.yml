@@ -23,7 +23,6 @@ jobs:
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       web: ${{ steps.filter.outputs.web }}
-      mobile: ${{ steps.filter.outputs.mobile }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -40,11 +39,6 @@ jobs:
             echo "web=true" >> $GITHUB_OUTPUT
           else
             echo "web=false" >> $GITHUB_OUTPUT
-          fi
-          if [ -d "apps/mobile" ] && [ -f "apps/mobile/pubspec.yaml" ]; then
-            echo "mobile=true" >> $GITHUB_OUTPUT
-          else
-            echo "mobile=false" >> $GITHUB_OUTPUT
           fi
 
   backend-ci:
@@ -162,31 +156,3 @@ jobs:
         env:
           NEXT_PUBLIC_API_BASE_URL: http://localhost:8080/api/v1
         run: npm run build
-
-  mobile-ci:
-    name: "Mobile CI (Flutter Android)"
-    needs: changes
-    if: needs.changes.outputs.mobile == 'true'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/mobile
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up Flutter SDK
-        uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
-          cache: true
-
-      - name: Install Flutter Packages
-        run: flutter pub get
-
-      - name: Analyze Dart Code
-        run: flutter analyze
-
-      - name: Run Flutter Widget & Unit Tests
-        run: flutter test
