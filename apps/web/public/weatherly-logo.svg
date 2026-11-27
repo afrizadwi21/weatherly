@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Synoptic Archival Folio Frame -->
+  <rect width="64" height="64" rx="8" fill="#141413"/>
+  <rect x="2.5" y="2.5" width="59" height="59" rx="5.5" stroke="#d8d5cd" stroke-width="1.2" stroke-opacity="0.35"/>
+
+  <!-- Isobar Horizon Lines -->
+  <line x1="8" y1="46" x2="56" y2="46" stroke="#f6f5f1" stroke-width="1.6" stroke-opacity="0.45"/>
+  <line x1="12" y1="52" x2="52" y2="52" stroke="#c93b2b" stroke-width="2.2" stroke-linecap="round"/>
+
+  <!-- Signal Vermilion Barometric Sun Disc -->
+  <circle cx="43" cy="21" r="7.5" fill="#c93b2b"/>
+
+  <!-- Etched Synoptic Cloud Silhouette -->
+  <path
+    d="M15 41H45.5C50.2 41 54 37.3 54 32.6C54 28.3 50.7 24.7 46.5 24.3C44.9 18.4 39.5 14 33 14C25.3 14 19 20.1 18.8 27.7C13.9 28.3 10 32.4 10 37.5C10 39.5 11.8 41 15 41Z"
+    fill="#f6f5f1"
+    stroke="#141413"
+    stroke-width="1.5"
+    stroke-linejoin="round"
+  />
+
+  <!-- Bold Monogram W Engraved Inside Cloud -->
+  <path
+    d="M21.5 26.5L25.2 36.5L29.5 28.5L33.8 36.5L37.5 26.5"
+    stroke="#141413"
+    stroke-width="2.6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

@@ -24,9 +24,16 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Weatherly — Know the Weather. Prepare Before It Happens.",
+  title: "Wheatherly",
   description:
-    "Weatherly memperkirakan kapan hujan tiba di titik Anda 10–60 menit sebelumnya, lengkap dengan peringatan BMKG, kualitas udara, UV, banjir, dan rekomendasi harian untuk Cekungan Bandung.",
+    "Platform intelijen cuaca real-time untuk seluruh 27 Kota & Kabupaten serta 627 Kecamatan di Jawa Barat (BMKG Kode 32), lengkap dengan Berita Acara Cuaca & Bencana, kualitas udara, UV, dan rekomendasi harian.",
+  icons: {
+    icon: [
+      { url: "/weatherly-logo.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/weatherly-logo.svg",
+    apple: "/weatherly-logo.svg",
+  },
 };
 
 /* Applies the saved (or system) theme before first paint, so there is no light flash in dark mode. */

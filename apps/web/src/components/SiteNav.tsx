@@ -96,8 +96,48 @@ export default function SiteNav() {
   return (
     <header className="site-nav">
       <div className="site-nav__bar">
-        <Link href="/" className="site-nav__brand" aria-label="Weatherly, beranda">
-          Weatherly
+        <Link href="/" className="site-nav__brand" aria-label="Wheatherly, beranda">
+          <svg
+            viewBox="0 0 64 64"
+            width="28"
+            height="28"
+            fill="none"
+            aria-hidden="true"
+            className="site-nav__logo"
+          >
+            <rect width="64" height="64" rx="8" fill="var(--ink)" />
+            <line
+              x1="8"
+              y1="46"
+              x2="56"
+              y2="46"
+              stroke="var(--paper)"
+              strokeWidth="1.8"
+              strokeOpacity="0.45"
+            />
+            <line
+              x1="12"
+              y1="52"
+              x2="52"
+              y2="52"
+              stroke="var(--signal-red)"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+            />
+            <circle cx="43" cy="21" r="7.5" fill="var(--signal-red)" />
+            <path
+              d="M15 41H45.5C50.2 41 54 37.3 54 32.6C54 28.3 50.7 24.7 46.5 24.3C44.9 18.4 39.5 14 33 14C25.3 14 19 20.1 18.8 27.7C13.9 28.3 10 32.4 10 37.5C10 39.5 11.8 41 15 41Z"
+              fill="var(--paper)"
+            />
+            <path
+              d="M21.5 26.5L25.2 36.5L29.5 28.5L33.8 36.5L37.5 26.5"
+              stroke="var(--ink)"
+              strokeWidth="2.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span>Wheatherly</span>
         </Link>
 
         <nav className="site-nav__links" aria-label="Modul Weatherly">
