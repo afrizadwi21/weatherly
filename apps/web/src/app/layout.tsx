@@ -47,6 +47,7 @@ export default function RootLayout({
   return (
     <html
       lang="id"
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
       className={`${spaceGrotesk.variable} ${plusJakartaSans.variable} ${jetBrainsMono.variable}`}
     >

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import SiteNav from "@/components/SiteNav";
 import {
   setStoredSession,
@@ -14,14 +14,17 @@ import "./login.css";
 export default function LoginPage() {
   const router = useRouter();
   const session = useWeatherlySession();
-  const [mode, setMode] = useState<"login" | "register">(() => {
-    if (typeof window !== "undefined") {
-      return new URLSearchParams(window.location.search).get("mode") === "register"
+  const [userSelectedMode, setUserSelectedMode] = useState<"login" | "register" | null>(null);
+  const urlMode = useSyncExternalStore(
+    () => () => {},
+    () =>
+      new URLSearchParams(window.location.search).get("mode") === "register"
         ? "register"
-        : "login";
-    }
-    return "login";
-  });
+        : "login",
+    () => "login"
+  );
+  const mode = userSelectedMode ?? urlMode;
+  const setMode = (nextMode: "login" | "register") => setUserSelectedMode(nextMode);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
