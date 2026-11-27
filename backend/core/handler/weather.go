@@ -5,10 +5,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/afrizadwi21/weatherly/backend/internal/config"
-	"github.com/afrizadwi21/weatherly/backend/internal/domain"
-	"github.com/afrizadwi21/weatherly/backend/internal/repository"
-	"github.com/afrizadwi21/weatherly/backend/internal/service"
+	"github.com/afrizadwi21/weatherly/backend/core/config"
+	"github.com/afrizadwi21/weatherly/backend/core/domain"
+	"github.com/afrizadwi21/weatherly/backend/core/repository"
+	"github.com/afrizadwi21/weatherly/backend/core/service"
 )
 
 // WeatherHandler exposes normalized weather, radar, and Rain Intelligence HTTP endpoints.

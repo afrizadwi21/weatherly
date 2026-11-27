@@ -4,7 +4,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/afrizadwi21/weatherly/backend/internal/domain"
+	"github.com/afrizadwi21/weatherly/backend/core/domain"
 )
 
 // EnvironmentService provides Air Quality (AQI) and UV Index analysis.

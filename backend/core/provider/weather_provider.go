@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/afrizadwi21/weatherly/backend/internal/domain"
+	"github.com/afrizadwi21/weatherly/backend/core/domain"
 )
 
 // WeatherClient fetches and normalizes weather data with TTL caching and offline resilience.

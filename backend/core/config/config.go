@@ -31,7 +31,7 @@ func Load() *Config {
 		AppEnv:                getEnv("APP_ENV", "development"),
 		AppPort:               getEnv("APP_PORT", "8080"),
 		AppTimezone:           getEnv("APP_TIMEZONE", "Asia/Jakarta"),
-		DatabaseURL:           getEnv("DATABASE_URL", "postgres://weatherly:weatherly_secret_password@localhost:5432/weatherly_db?sslmode=disable"),
+		DatabaseURL:           getEnv("DATABASE_URL", getEnv("DATABASE_NAME", "postgres://weatherly:weatherly_secret_password@localhost:5432/weatherly_db?sslmode=disable")),
 		RedisAddr:             getEnv("REDIS_ADDR", "localhost:6379"),
 		JWTSecretKey:          getEnv("JWT_SECRET_KEY", "dev-secret-key-change-in-production"),
 		JWTAccessExpiryMins:   getEnvInt("JWT_ACCESS_EXPIRY_MINUTES", 30),

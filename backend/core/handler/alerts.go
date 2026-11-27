@@ -3,8 +3,8 @@ package handler
 import (
 	"net/http"
 
-	"github.com/afrizadwi21/weatherly/backend/internal/config"
-	"github.com/afrizadwi21/weatherly/backend/internal/service"
+	"github.com/afrizadwi21/weatherly/backend/core/config"
+	"github.com/afrizadwi21/weatherly/backend/core/service"
 )
 
 // AlertHandler exposes Extreme Weather Alerts (/api/v1/alerts*) endpoints for the Web platform.

@@ -6,8 +6,8 @@ import (
 	"math"
 	"time"
 
-	"github.com/afrizadwi21/weatherly/backend/internal/domain"
-	"github.com/afrizadwi21/weatherly/backend/internal/provider"
+	"github.com/afrizadwi21/weatherly/backend/core/domain"
+	"github.com/afrizadwi21/weatherly/backend/core/provider"
 )
 
 // WeatherService coordinates live weather normalization, forecasts, and Rain Intelligence.

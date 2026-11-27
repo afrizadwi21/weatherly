@@ -10,8 +10,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/afrizadwi21/weatherly/backend/internal/config"
-	"github.com/afrizadwi21/weatherly/backend/internal/handler"
+	"github.com/afrizadwi21/weatherly/backend/core/config"
+	"github.com/afrizadwi21/weatherly/backend/core/handler"
 )
 
 func main() {

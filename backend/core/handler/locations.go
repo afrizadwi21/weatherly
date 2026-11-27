@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/afrizadwi21/weatherly/backend/internal/config"
-	"github.com/afrizadwi21/weatherly/backend/internal/domain"
-	"github.com/afrizadwi21/weatherly/backend/internal/repository"
+	"github.com/afrizadwi21/weatherly/backend/core/config"
+	"github.com/afrizadwi21/weatherly/backend/core/domain"
+	"github.com/afrizadwi21/weatherly/backend/core/repository"
 )
 
 // LocationHandler manages GPS and favorite monitoring location endpoints.

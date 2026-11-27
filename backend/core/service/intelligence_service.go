@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/afrizadwi21/weatherly/backend/internal/domain"
+	"github.com/afrizadwi21/weatherly/backend/core/domain"
 )
 
 // IntelligenceService manages Flood Monitoring and the Two-Stage AI Weather Insights Pipeline.

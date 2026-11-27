@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/afrizadwi21/weatherly/backend/internal/domain"
+	"github.com/afrizadwi21/weatherly/backend/core/domain"
 )
 
 // AlertService manages extreme weather alerts and deduplication keys for Web saved-location alerts.

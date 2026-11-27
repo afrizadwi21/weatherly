@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/afrizadwi21/weatherly/backend/internal/config"
-	"github.com/afrizadwi21/weatherly/backend/internal/provider"
-	"github.com/afrizadwi21/weatherly/backend/internal/repository"
-	"github.com/afrizadwi21/weatherly/backend/internal/service"
+	"github.com/afrizadwi21/weatherly/backend/core/config"
+	"github.com/afrizadwi21/weatherly/backend/core/provider"
+	"github.com/afrizadwi21/weatherly/backend/core/repository"
+	"github.com/afrizadwi21/weatherly/backend/core/service"
 )
 
 // HealthResponse represents the JSON contract for /api/v1/health.

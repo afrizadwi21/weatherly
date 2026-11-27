@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/afrizadwi21/weatherly/backend/internal/config"
-	"github.com/afrizadwi21/weatherly/backend/internal/domain"
-	"github.com/afrizadwi21/weatherly/backend/internal/service"
+	"github.com/afrizadwi21/weatherly/backend/core/config"
+	"github.com/afrizadwi21/weatherly/backend/core/domain"
+	"github.com/afrizadwi21/weatherly/backend/core/service"
 )
 
 // TravelCommunityHandler exposes Smart Travel (/api/v1/travel/*) and Community Reports (/api/v1/community/*) endpoints.

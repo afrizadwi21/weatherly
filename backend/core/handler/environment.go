@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/afrizadwi21/weatherly/backend/internal/service"
+	"github.com/afrizadwi21/weatherly/backend/core/service"
 )
 
 // EnvironmentHandler exposes Air Quality (/api/v1/air-quality/*) and UV (/api/v1/uv/*) endpoints.

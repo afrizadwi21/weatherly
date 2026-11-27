@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/afrizadwi21/weatherly/backend/internal/domain"
-	"github.com/afrizadwi21/weatherly/backend/internal/service"
+	"github.com/afrizadwi21/weatherly/backend/core/domain"
+	"github.com/afrizadwi21/weatherly/backend/core/service"
 )
 
 // IntelligenceHandler exposes Flood Monitoring (/api/v1/flood/*) and AI Insights (/api/v1/insights/*) endpoints.
