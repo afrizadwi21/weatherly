@@ -316,10 +316,10 @@ export async function GET(req: NextRequest) {
         sql`SELECT COUNT(*)::int AS cnt FROM weatherly_users`,
       ]);
 
-      const locations = locRows.map((r) => mapLocationRow(r as Record<string, unknown>));
-      const travel_routes = routeRows.map((r) => mapRouteRow(r as Record<string, unknown>));
-      const community_reports = reportRows.map((r) => mapReportRow(r as Record<string, unknown>));
-      const ai_insights = insightRows.map((r) => mapInsightRow(r as Record<string, unknown>));
+      const locations = locRows.map((r: Record<string, unknown>) => mapLocationRow(r));
+      const travel_routes = routeRows.map((r: Record<string, unknown>) => mapRouteRow(r));
+      const community_reports = reportRows.map((r: Record<string, unknown>) => mapReportRow(r));
+      const ai_insights = insightRows.map((r: Record<string, unknown>) => mapInsightRow(r));
       const usersCount = Number((userCountRows[0] as Record<string, unknown>)?.cnt || 0);
 
       return NextResponse.json({
@@ -458,9 +458,9 @@ export async function POST(req: NextRequest) {
             email: String(found.email),
             name: String(found.full_name),
           },
-          locations: locRows.map((r) => mapLocationRow(r as Record<string, unknown>)),
-          travel_routes: routeRows.map((r) => mapRouteRow(r as Record<string, unknown>)),
-          ai_insights: insightRows.map((r) => mapInsightRow(r as Record<string, unknown>)),
+          locations: locRows.map((r: Record<string, unknown>) => mapLocationRow(r)),
+          travel_routes: routeRows.map((r: Record<string, unknown>) => mapRouteRow(r)),
+          ai_insights: insightRows.map((r: Record<string, unknown>) => mapInsightRow(r)),
         });
       }
 
@@ -501,7 +501,7 @@ export async function POST(req: NextRequest) {
           SELECT * FROM weatherly_locations WHERE user_id = ${userId} ORDER BY created_at DESC
         `;
         return NextResponse.json({
-          locations: locRows.map((r) => mapLocationRow(r as Record<string, unknown>)),
+          locations: locRows.map((r: Record<string, unknown>) => mapLocationRow(r)),
         });
       }
 
@@ -539,9 +539,9 @@ export async function POST(req: NextRequest) {
         const routeRows = await sql`
           SELECT * FROM weatherly_travel_routes WHERE user_id = ${userId} ORDER BY created_at DESC
         `;
-        const mapped = routeRows.map((r) => mapRouteRow(r as Record<string, unknown>));
+        const mapped = routeRows.map((r: Record<string, unknown>) => mapRouteRow(r));
         return NextResponse.json({
-          route: mapped.find((r) => r.id === newId) || mapped[0],
+          route: mapped.find((r: DBTravelRoute) => r.id === newId) || mapped[0],
           travel_routes: mapped,
         });
       }
@@ -557,7 +557,7 @@ export async function POST(req: NextRequest) {
           SELECT * FROM weatherly_travel_routes WHERE user_id = ${userId} ORDER BY created_at DESC
         `;
         return NextResponse.json({
-          travel_routes: routeRows.map((r) => mapRouteRow(r as Record<string, unknown>)),
+          travel_routes: routeRows.map((r: Record<string, unknown>) => mapRouteRow(r)),
         });
       }
 
@@ -619,9 +619,9 @@ export async function POST(req: NextRequest) {
         const reportRows = await sql`
           SELECT * FROM weatherly_community_reports ORDER BY created_at DESC
         `;
-        const mapped = reportRows.map((r) => mapReportRow(r as Record<string, unknown>));
+        const mapped = reportRows.map((r: Record<string, unknown>) => mapReportRow(r));
         return NextResponse.json({
-          report: mapped.find((r) => r.id === newId) || mapped[0],
+          report: mapped.find((r: DBCommunityReport) => r.id === newId) || mapped[0],
           community_reports: mapped,
         });
       }
@@ -656,7 +656,7 @@ export async function POST(req: NextRequest) {
           SELECT * FROM weatherly_community_reports ORDER BY created_at DESC
         `;
         return NextResponse.json({
-          community_reports: reportRows.map((r) => mapReportRow(r as Record<string, unknown>)),
+          community_reports: reportRows.map((r: Record<string, unknown>) => mapReportRow(r)),
         });
       }
 
@@ -678,7 +678,7 @@ export async function POST(req: NextRequest) {
           SELECT * FROM weatherly_ai_insights WHERE user_id = ${userId} ORDER BY created_at DESC
         `;
         return NextResponse.json({
-          ai_insights: insightRows.map((r) => mapInsightRow(r as Record<string, unknown>)),
+          ai_insights: insightRows.map((r: Record<string, unknown>) => mapInsightRow(r)),
         });
       }
 
